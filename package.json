@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/deepmemo-imports",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -8,7 +8,8 @@
     "package:watch": "tsc -w --project tsconfig.json",
     "package:unbuild": "rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && (cd ./migrations && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports/gql && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./benchmarks && rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts && cd ..) && (cd ./imports/router && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./tests && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../)",
     "package:publish": "npm run package:build && npm publish --access public && npm run package:unbuild",
-    "package:release": "npm version patch && git push"
+    "package:release": "npm version patch && git push",
+    "package:app:dev": "npm run package:build; rsync -a ./imports ../deepmemo-app/node_modules/@deep-foundation/deepmemo-imports/; (cd ../deepmemo-app; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
     "@deep-foundation/deeplinks": "^0.0.340",
