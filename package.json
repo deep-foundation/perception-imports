@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/deepmemo-imports",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "package:app:dev": "npm run package:build; rsync -a ./imports ../deepmemo-app/node_modules/@deep-foundation/deepmemo-imports/; (cd ../deepmemo-app; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
-    "@deep-foundation/deeplinks": "^0.0.340",
+    "@deep-foundation/deeplinks": "^0.0.x",
     "react": "^18.3.1"
   },
   "engines": {
