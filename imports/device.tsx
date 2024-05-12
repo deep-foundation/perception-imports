@@ -7,8 +7,8 @@ import isEqual from 'lodash/isEqual';
 interface DeviceContext {
   id?: Id;
   name: string;
-  info: DeviceInfo;
-  battery: BatteryInfo;
+  info: DeviceInfo | {};
+  battery: BatteryInfo | {};
   language: string;
   tag: string;
 }
@@ -33,27 +33,29 @@ export function DeviceProvider({
   const deviceRef = useRef<DeviceContext | null>(null);
   const DeviceRef = useRef<Id | null>(null);
   const sync = useCallback(async (device: DeviceContext, containerId: Id) => {
-    const Contain = deep.idLocal('@deep-foundation/core', 'Contain');
-    const Device = DeviceRef.current = DeviceRef.current || await deep.id('@deep-foundation/deepmemo-links', 'Device');
-    let { id, ..._device } = device;
-    if (id) {
-      await deep.update({ link_id: id }, { value: _device }, { table: 'objects' });
-    } else {
-      const { data: contains } = await deep.select({ type_id: Contain, from_id: containerId, string: { value: _device.name } });
-      if (!contains.length) {
-        const { data: [{ id }] } = await deep.insert({
-          type_id: Device,
-          in: { data: { type_id: Contain, from_id: containerId, string: _device.name } },
-          object: _device,
-        });
-      } else {
-        id = contains[0].to_id;
+    if (deep && containerId) {
+      const Contain = deep.idLocal('@deep-foundation/core', 'Contain');
+      const Device = DeviceRef.current = DeviceRef.current || await deep.id('@deep-foundation/deepmemo-links', 'Device');
+      let { id, ..._device } = device;
+      if (id) {
         await deep.update({ link_id: id }, { value: _device }, { table: 'objects' });
+      } else {
+        const { data: contains } = await deep.select({ type_id: Contain, from_id: containerId, string: { value: _device.name } });
+        if (!contains.length) {
+          const { data: [{ id }] } = await deep.insert({
+            type_id: Device,
+            in: { data: { type_id: Contain, from_id: containerId, string: _device.name } },
+            object: _device,
+          });
+        } else {
+          id = contains[0].to_id;
+          await deep.update({ link_id: id }, { value: _device }, { table: 'objects' });
+        }
       }
-    }
-    if (!deviceRef?.current?.id) {
-      deviceRef.current.id = id;
-      setDevice({ id, ..._device });
+      if (!deviceRef?.current?.id) {
+        deviceRef.current.id = id;
+        setDevice({ id, ..._device });
+      }
     }
   }, []);
   useEffect(() => {
@@ -61,10 +63,10 @@ export function DeviceProvider({
       const device: DeviceContext = {
         ...(deviceRef.current || {}),
         name: (await CapacitorDevice.getId()).identifier,
-        info: await CapacitorDevice.getInfo(),
-        battery: await CapacitorDevice.getBatteryInfo(),
-        language: (await CapacitorDevice.getLanguageCode()).value,
-        tag: (await CapacitorDevice.getLanguageTag()).value,
+        info: await (async () => { try { return await CapacitorDevice.getInfo() } catch(e) { return {} }})(),
+        battery: await (async () => { try { return await CapacitorDevice.getBatteryInfo() } catch(e) { return {} }})(),
+        language: await (async () => { try { return (await CapacitorDevice.getLanguageCode()).value } catch(e) { return 'en' }})(),
+        tag: await (async () => { try { return (await CapacitorDevice.getLanguageTag()).value } catch(e) { return 'en' }})(),
       };
       console.log(isEqual(deviceRef.current, device), deviceRef.current, device);
       if (!isEqual(deviceRef.current, device)) {

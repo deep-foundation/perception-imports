@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@capacitor/core": "^5.7.5",
-    "@capacitor/device": "^5.0.7"
+    "@capacitor/device": "^5.0.7",
+    "@capacitor/geolocation": "^5.0.7"
   }
 }
