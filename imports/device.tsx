@@ -68,7 +68,6 @@ export function DeviceProvider({
         language: await (async () => { try { return (await CapacitorDevice.getLanguageCode()).value } catch(e) { return 'en' }})(),
         tag: await (async () => { try { return (await CapacitorDevice.getLanguageTag()).value } catch(e) { return 'en' }})(),
       };
-      console.log(isEqual(deviceRef.current, device), deviceRef.current, device);
       if (!isEqual(deviceRef.current, device)) {
         deviceRef.current = device;
         setDevice(device);
