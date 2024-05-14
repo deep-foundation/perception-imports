@@ -3,6 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { Id } from '@deep-foundation/deeplinks/imports/minilinks';
 import { useDeep } from '@deep-foundation/deeplinks/imports/client';
 import isEqual from 'lodash/isEqual';
+import { useSaver } from './saver';
 
 interface DeviceContext {
   id?: Id;
@@ -23,38 +24,27 @@ export function DeviceProvider({
   children,
   containerId,
   interval = 1000,
+  saver = false,
 }: {
   children?: any;
   containerId: Id;
   interval?: number;
+  saver?: boolean;
 }) {
   const deep = useDeep();
   const [device, setDevice] = useState<DeviceContext | null>(null);
   const deviceRef = useRef<DeviceContext | null>(null);
-  const DeviceRef = useRef<Id | null>(null);
+  const save = useSaver({
+    mode: 'geolocation',
+    getType: () => deep.id('@deep-foundation/deepmemo-links', 'Device'),
+  });
   const sync = useCallback(async (device: DeviceContext, containerId: Id) => {
     if (deep && containerId) {
-      const Contain = deep.idLocal('@deep-foundation/core', 'Contain');
-      const Device = DeviceRef.current = DeviceRef.current || await deep.id('@deep-foundation/deepmemo-links', 'Device');
-      let { id, ..._device } = device;
-      if (id) {
-        await deep.update({ link_id: id }, { value: _device }, { table: 'objects' });
-      } else {
-        const { data: contains } = await deep.select({ type_id: Contain, from_id: containerId, string: { value: _device.name } });
-        if (!contains.length) {
-          const { data: [{ id }] } = await deep.insert({
-            type_id: Device,
-            in: { data: { type_id: Contain, from_id: containerId, string: _device.name } },
-            object: _device,
-          });
-        } else {
-          id = contains[0].to_id;
-          await deep.update({ link_id: id }, { value: _device }, { table: 'objects' });
-        }
-      }
-      if (!deviceRef?.current?.id) {
+      let { id, ...object } = device;
+      id = await save(object, id, object.name, containerId);
+      if (!deviceRef?.current?.id && !!id) {
         deviceRef.current.id = id;
-        setDevice({ id, ..._device });
+        setDevice({ id, ...object });
       }
     }
   }, []);
@@ -68,7 +58,7 @@ export function DeviceProvider({
         language: await (async () => { try { return (await CapacitorDevice.getLanguageCode()).value } catch(e) { return 'en' }})(),
         tag: await (async () => { try { return (await CapacitorDevice.getLanguageTag()).value } catch(e) { return 'en' }})(),
       };
-      if (!isEqual(deviceRef.current, device)) {
+      if (!deviceRef.current || !isEqual(deviceRef.current, device)) {
         deviceRef.current = device;
         setDevice(device);
       }
@@ -76,8 +66,8 @@ export function DeviceProvider({
     return () => clearInterval(i);
   }, []);
   useEffect(() => {
-    !!device && sync(device, containerId);
-  }, [device]);
+    !!device && saver && sync(device, containerId);
+  }, [device, saver]);
   return <>
     <deviceContext.Provider value={device}>
       {children}
