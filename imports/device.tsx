@@ -67,7 +67,7 @@ export function DeviceProvider({
   }, []);
   useEffect(() => {
     !!device && saver && sync(device, containerId);
-  }, [device, saver]);
+  }, [device, saver, containerId]);
   return <>
     <deviceContext.Provider value={device}>
       {children}

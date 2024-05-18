@@ -10,3 +10,24 @@ When deepmemo-imports and deepmemo-app cloned in one directory, you can sync dee
 ```
 npm run package:app:dev
 ```
+
+## Description
+
+| Feature | foreground | background | save-to-deep |
+| --- | --- | --- | --- |
+| [`<DeviceProvider>`](https://github.com/deep-foundation/deepmemo-imports/blob/main/imports/device.tsx) | 🟢 | 🔴 | 🟢 |
+| [`<GeolocationProvider>`](https://github.com/deep-foundation/deepmemo-imports/blob/main/imports/geolocation.tsx) | 🟢 | 🔴 | 🟢 |
+| Voice | 🔴 | 🔴 | 🔴 |
+| Contacts | 🔴 | 🔴 | 🔴 |
+| Camera | 🔴 | 🔴 | 🔴 |
+| Action | 🔴 | 🔴 | 🔴 |
+| Haptics | 🔴 | 🔴 | 🔴 |
+| Motion | 🔴 | 🔴 | 🔴 |
+| Network | 🔴 | 🔴 | 🔴 |
+| Reader | 🔴 | 🔴 | 🔴 |
+
+- 🔴 not realized
+- 🟣 in process
+- 🟠 has problem, may  be link to issue
+- 🔵 realized but not tested
+- 🟢 tested

@@ -50,7 +50,6 @@ export function useGeolocationSync (positionRef, setPosition) {
     getType: () => deep.id('@deep-foundation/deepmemo-links', 'Position'),
   });
   return useCallback(async (position: Position) => {
-    console.log('useGeolocationSync sync', position);
     if (deep && device?.id) {
       let { id, ...object } = position;
       id = await save(omitBy(object, isNil), id, 'position', device.id);
@@ -79,7 +78,6 @@ export function GeolocationProviderBrowser({
   const [timestamp, setTimestamp] = useState<GeolocationContext['timestamp']>(null);
   const [position, setPosition] = useState<Position | null>(null);
   const positionRef = useRef<Position | null>(null);
-  const PositionRef = useRef<Id | null>(null);
   const check: GeolocationContext['check'] = useCallback(async (): Promise<GeolocationContext['status']> => status, []) as any;
   const request: GeolocationContext['request'] = useCallback(async (): Promise<GeolocationContext['status']> => {
     setWatcher(createGeolocation());
@@ -138,7 +136,6 @@ export function GeolocationProviderCapacitor({
   const [position, setPosition] = useState<Position | null>(null);
   const [timestamp, setTimestamp] = useState<GeolocationContext['timestamp']>(null);
   const positionRef = useRef<Position | null>(null);
-  const PositionRef = useRef<Id | null>(null);
   const getStatus = useCallback((permission) => permission.location === 'denied' ? false : permission.location === 'granted' ? true : null || permission.coarseLocation === 'denied' ? false : permission.coarseLocation === 'granted' ? true : null, []);
   const status = useMemo(() => {
     return getStatus(permission);
@@ -154,7 +151,6 @@ export function GeolocationProviderCapacitor({
   }, []) as any;
   useEffect(() => {
     Geolocation.watchPosition({ timeout: interval }, (position, error) => {
-      console.log('useGeolocationSync', position);
       if (!isEqual(positionRef.current, position.coords)) {
         positionRef.current = position.coords;
         const p: Position = { ...position.coords };
@@ -162,7 +158,6 @@ export function GeolocationProviderCapacitor({
         setPosition(p);
       }
       setTimestamp(position.timestamp);
-      console.error(error);
     });
   }, [status]);
   useEffect(() => {

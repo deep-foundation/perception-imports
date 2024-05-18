@@ -42,6 +42,8 @@
     "@capacitor/core": "^5.7.5",
     "@capacitor/device": "^5.0.7",
     "@capacitor/geolocation": "^5.0.7",
-    "@solid-primitives/geolocation": "^1.4.14"
+    "@solid-primitives/geolocation": "^1.4.14",
+    "base64-blob": "^1.4.1",
+    "capacitor-voice-recorder": "^5.0.0"
   }
 }
