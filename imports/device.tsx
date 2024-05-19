@@ -58,7 +58,7 @@ export function DeviceProvider({
         language: await (async () => { try { return (await CapacitorDevice.getLanguageCode()).value } catch(e) { return 'en' }})(),
         tag: await (async () => { try { return (await CapacitorDevice.getLanguageTag()).value } catch(e) { return 'en' }})(),
       };
-      if (!deviceRef.current || !isEqual(deviceRef.current, device)) {
+      if (!deviceRef.current || !isEqual(deviceRef.current, device) || !deviceRef?.current?.id) {
         deviceRef.current = device;
         setDevice(device);
       }
