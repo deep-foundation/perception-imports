@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/deepmemo-imports",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "package:unbuild": "rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && (cd ./migrations && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports/gql && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./benchmarks && rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts && cd ..) && (cd ./imports/router && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./tests && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../)",
     "package:publish": "npm run package:build && npm publish --access public && npm run package:unbuild",
     "package:release": "npm version patch && git push",
-    "package:app:dev": "npm run package:build; rsync -a ./imports ../deepmemo-app/node_modules/@deep-foundation/deepmemo-imports/; (cd ../deepmemo-app; rm -rf app; npm run dev)"
+    "package:app:sync": "npm run package:build; rsync -a ./imports ../deepmemo-app/node_modules/@deep-foundation/deepmemo-imports/;",
+    "package:app:dev": "npm run package:app:sync; (cd ../deepmemo-app; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
     "@deep-foundation/deeplinks": "^0.0.343",
@@ -38,6 +39,7 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
+    "@capacitor-community/background-geolocation": "^1.2.17",
     "@capacitor/app": "^5.0.7",
     "@capacitor/core": "^5.7.5",
     "@capacitor/device": "^5.0.7",

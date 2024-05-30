@@ -35,7 +35,7 @@ export function DeviceProvider({
   const [device, setDevice] = useState<DeviceContext | null>(null);
   const deviceRef = useRef<DeviceContext | null>(null);
   const save = useSaver({
-    mode: 'geolocation',
+    mode: 'device',
     getType: () => deep.id('@deep-foundation/deepmemo-links', 'Device'),
   });
   const sync = useCallback(async (device: DeviceContext, containerId: Id) => {
@@ -50,17 +50,20 @@ export function DeviceProvider({
   }, []);
   useEffect(() => {
     const i = setInterval(async () => {
-      const device: DeviceContext = {
-        ...(deviceRef.current || {}),
-        name: (await CapacitorDevice.getId()).identifier,
-        info: await (async () => { try { return await CapacitorDevice.getInfo() } catch(e) { return {} }})(),
-        battery: await (async () => { try { return await CapacitorDevice.getBatteryInfo() } catch(e) { return {} }})(),
-        language: await (async () => { try { return (await CapacitorDevice.getLanguageCode()).value } catch(e) { return 'en' }})(),
-        tag: await (async () => { try { return (await CapacitorDevice.getLanguageTag()).value } catch(e) { return 'en' }})(),
-      };
-      if (!deviceRef.current || !isEqual(deviceRef.current, device) || !deviceRef?.current?.id) {
-        deviceRef.current = device;
-        setDevice(device);
+      try {
+        const device: DeviceContext = {
+          ...(deviceRef.current || {}),
+          name: (await CapacitorDevice.getId()).identifier,
+          info: await (async () => { try { return await CapacitorDevice.getInfo() } catch(e) { return {} }})(),
+          battery: await (async () => { try { return await CapacitorDevice.getBatteryInfo() } catch(e) { return {} }})(),
+          language: await (async () => { try { return (await CapacitorDevice.getLanguageCode()).value } catch(e) { return 'en' }})(),
+          tag: await (async () => { try { return (await CapacitorDevice.getLanguageTag()).value } catch(e) { return 'en' }})(),
+        };
+        if (!deviceRef.current || !isEqual(deviceRef.current, device) || !deviceRef?.current?.id) {
+          deviceRef.current = device;
+          setDevice(device);
+        }
+      } catch(e) {
       }
     }, interval);
     return () => clearInterval(i);
