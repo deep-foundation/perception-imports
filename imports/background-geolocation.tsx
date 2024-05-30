@@ -48,67 +48,71 @@ export function BackgroundGeolocationProvider({
   const status = useMemo(() => {
     return !!plugin && !!watcher;
   }, [plugin, watcher]);
-  const saverRef = useRef(saver);
-  saverRef.current = saver;
+  const sync = useGeolocationSync(positionRef, setPosition, 'background-geolocation');
   const check: GeolocationContext['check'] = useCallback(async (): Promise<GeolocationContext['status']> => !!watcher, [watcher]) as any;
   const request: GeolocationContext['request'] = useCallback(async (): Promise<GeolocationContext['status']> => {
-    if (!!watcher) return true;
-    else {
-      return new Promise((res, rej) => {
-        console.log('DeepmemoBackgroundGeolocation plugin.addWatcher');
-        plugin.addWatcher({
-          backgroundMessage: "Cancel to prevent battery drain.",
-          backgroundTitle: "Tracking You.",
-          requestPermissions: true,
-          stale: false,
-          distanceFilter: 50
-        }, (location, error) => {
-          console.log(`DeepmemoBackgroundGeolocation addWatcher`);
-          if (error) {
-            console.log(`DeepmemoBackgroundGeolocation error ${error.code} ${error.toString()}`);
-            if (error.code === "NOT_AUTHORIZED") {
-              if (window.confirm(
-                "This app needs your location, " +
-                "but does not have permission.\n\n" +
-                "Open settings now?"
-              )) {
-                plugin.openSettings();
-              }
-            }
-            return console.error(error);
-          }
-          const p: Position = {
-            accuracy: location?.accuracy,
-            altitude: location?.altitude,
-            altitudeAccuracy: location?.altitudeAccuracy,
-            heading: convertBearingToHeading(location?.bearing),
-            latitude: location?.latitude,
-            longitude: location?.longitude,
-            speed: location?.speed,
-          };
-          if (positionRef?.current?.id) p.id = positionRef.current.id;
-          console.log('DeepmemoBackgroundGeolocation set');
-          console.log(JSON.stringify(p));
-          setPosition(p);
-          setTimestamp(location?.time);
-          if (saverRef.current) sync(p);
-          console.log('DeepmemoBackgroundGeolocation synced');
-          console.log(JSON.stringify(p));
-        }
-        ).then(function after_the_watcher_has_been_added(watcher_id) {
-          console.log(`DeepmemoBackgroundGeolocation after_the_watcher_has_been_added ${watcher_id}`);
-          setWatcher(watcher_id);
-          res(true);
-        }).catch((error) => {
-          console.log(`DeepmemoBackgroundGeolocation catch ${error.toString()}`);
-          setWatcher(null);
-          res(false);
-        });
-      });
+    if (!!watcher) {
+      console.log('DeepmemoBackgroundGeolocation !!watcher remote');
+      await plugin.removeWatcher({ id: watcher });
     }
-  }, [watcher]) as any;
+    return new Promise((res, rej) => {
+      console.log('DeepmemoBackgroundGeolocation plugin.addWatcher');
+      plugin.addWatcher({
+        backgroundMessage: "Cancel to prevent battery drain.",
+        backgroundTitle: "Tracking You.",
+        requestPermissions: true,
+        stale: false,
+        distanceFilter: 50
+      }, (location, error) => {
+        console.log(`DeepmemoBackgroundGeolocation addWatcher`);
+        if (error) {
+          console.log(`DeepmemoBackgroundGeolocation error ${error.code} ${error.toString()}`);
+          if (error.code === "NOT_AUTHORIZED") {
+            if (window.confirm(
+              "This app needs your location, " +
+              "but does not have permission.\n\n" +
+              "Open settings now?"
+            )) {
+              plugin.openSettings();
+            }
+          }
+          return console.error(error);
+        }
+        const p: Position = {
+          accuracy: location?.accuracy,
+          altitude: location?.altitude,
+          altitudeAccuracy: location?.altitudeAccuracy,
+          heading: convertBearingToHeading(location?.bearing),
+          latitude: location?.latitude,
+          longitude: location?.longitude,
+          speed: location?.speed,
+        };
+        if (positionRef?.current?.id) p.id = positionRef.current.id;
+        console.log('DeepmemoBackgroundGeolocation set');
+        console.log(JSON.stringify(p));
+        setPosition(p);
+        setTimestamp(location?.time);
+        if (saver) sync(p);
+        console.log(`DeepmemoBackgroundGeolocation synced ${saver ? 1 : 0}`);
+        console.log(JSON.stringify(p));
+      }
+      ).then(function after_the_watcher_has_been_added(watcher_id) {
+        console.log(`DeepmemoBackgroundGeolocation after_the_watcher_has_been_added ${watcher_id}`);
+        setWatcher(watcher_id);
+        res(true);
+      }).catch((error) => {
+        console.log(`DeepmemoBackgroundGeolocation catch ${error.toString()}`);
+        setWatcher(null);
+        res(false);
+      });
+    });
+  }, [watcher, saver, sync]) as any;
   const stop: GeolocationContext['stop'] = useCallback(async (): Promise<GeolocationContext['status']> => {
-    await plugin.removeWatcher({ id: watcher });
+    console.log('DeepmemoBackgroundGeolocation stop');
+    if (watcher) {
+      await plugin.removeWatcher({ id: watcher });
+      setWatcher(null);
+    }
     return false;
   }, [watcher]);
   useEffect(() => {
@@ -117,7 +121,6 @@ export function BackgroundGeolocationProvider({
     }
     return () => {}
   }, [manual]);
-  const sync = useGeolocationSync(positionRef, setPosition, 'background-geolocation');
   return <>
     <backgroundGeolocationContext.Provider value={{ _cbg: +watcher, position, timestamp, status, check, request, stop }}>
       {children}
