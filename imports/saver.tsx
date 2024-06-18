@@ -35,26 +35,34 @@ export function useSaver({
   const saver = useContext(saverContext);
   const deep = useDeep();
   const TypeRef = useRef<Id | null>(null);
+  const promiseRef = useRef<any>();
   const save = useCallback(async (object: any, id: Id, name: string, containerId: Id, Type: Id) => {
-    const Contain = deep.idLocal('@deep-foundation/core', 'Contain');
-    if (id) {
-      await deep.update({ link_id: id }, { value: object }, { table: 'objects' });
-    } else {
-      const { data: contains } = await deep.select({ type_id: Contain, from_id: containerId, string: { value: name } });
-      if (!contains.length) {
-        const { data: [{ id: _id }], error } = await deep.insert({
-          type_id: Type,
-          in: { data: { type_id: Contain, from_id: containerId, string: name } },
-          object: object,
-        });
-        id = _id;
-        console.log(`useSaver inserted id: ${id} error: ${error}`);
-      } else {
-        id = contains[0].to_id;
+    const f = async () => {
+      const Contain = deep.idLocal('@deep-foundation/core', 'Contain');
+      if (id) {
         await deep.update({ link_id: id }, { value: object }, { table: 'objects' });
+      } else {
+        const { data: contains } = await deep.select({ type_id: Contain, from_id: containerId, string: { value: name } });
+        if (!contains.length) {
+          const { data: [{ id: _id }], error } = await deep.insert({
+            type_id: Type,
+            in: { data: { type_id: Contain, from_id: containerId, string: name } },
+            object: object,
+          });
+          id = _id;
+          console.log(`useSaver inserted id: ${id} error: ${error}`);
+        } else {
+          id = contains[0].to_id;
+          await deep.update({ link_id: id }, { value: object }, { table: 'objects' });
+        }
       }
-    }
-    return id;
+      return id;
+    };
+    promiseRef.current = new Promise(async (res) => {
+      await promiseRef.current;
+      res(await f());
+    });
+    return await promiseRef.current;
   }, [deep]);
   return useCallback(async (object: any, id: Id, name: string, containerId: Id) => {
     if (deep && containerId) {

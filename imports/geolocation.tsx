@@ -51,6 +51,7 @@ export function useGeolocationSync (positionRef, setPosition, mode = 'geolocatio
     getType: () => deep.id('@deep-foundation/deepmemo-links', 'Position'),
   });
   return useCallback(async (position: Position) => {
+    console.log(`useGeolocationSync ${device?.id}`);
     if (deep && device?.id) {
       let { id, ...object } = position;
       id = await save(omitBy(object, isNil), id, 'position', device.id);
