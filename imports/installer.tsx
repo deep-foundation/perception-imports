@@ -59,7 +59,10 @@ export function InstallerProviderCore({
 }: InstallerProviderProps) {
   const deep = useDeep();
   const [isAdmin, setIsAdmin] = useState(null);
-  const [installing, setInstalling] = useLocalStore('deepmemo-links-installing', false);
+  const [_installing, setInstalling] = useLocalStore('deepmemo-links-installing', false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const installing = !mounted ? false : _installing;
 
   useEffect(() => { (async () => {
     if (deep?.linkId) setIsAdmin(await deep.can(null, deep.linkId, deep.idLocal('@deep-foundation/core', 'AllowAdmin')));
@@ -135,6 +138,15 @@ export function InstallerProviderCore({
       setInstalling(true);
 
       const Install = await deep.id('@deep-foundation/npm-packager', 'Install');
+
+      await deep.insert({
+        type_id: deep.idLocal('@deep-foundation/core', 'Join'),
+        from_id: await deep.id('deep','users','packages'),
+        to_id: deep?.linkId,
+        in: { data: [
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+        ]}
+      });
 
       const installPackage = async (name) => {
         const { data: [chatgptAzure] } = await deep.insert({
