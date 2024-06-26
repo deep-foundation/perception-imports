@@ -27,11 +27,17 @@ interface InstallerContextData {
   '@deep-foundation/chatgpt-azure'?: LinkPlain<Id>[];
   '@deep-foundation/chatgpt-azure-deep'?: LinkPlain<Id>[];
   '@deep-foundation/chatgpt-azure-templates'?: LinkPlain<Id>[];
+  '@deep-foundation/voice-to-sync-text-file'?: LinkPlain<Id>[];
   '@deep-foundation/deepmemo-links'?: LinkPlain<Id>[];
+  '@deep-foundation/telegram-bot'?: LinkPlain<Id>[];
+  '@deep-foundation/deepmemorybot'?: LinkPlain<Id>[];
   'ApiKey'?: LinkPlain<Id>[];
   'UsesApiKey'?: LinkPlain<Id>[];
   'Model'?: LinkPlain<Id>[];
   'UsesModel'?: LinkPlain<Id>[];
+  'TelegramToken'?: LinkPlain<Id>[];
+  'TelegramActive'?: LinkPlain<Id>[];
+  'DeepmemoryActive'?: LinkPlain<Id>[];
 
   space: LinkPlain<Id>;
 
@@ -43,6 +49,11 @@ interface InstallerContextData {
   saveApiKey?: (value: string) => Promise<void>;
   saveUsesModel?: (id: Id) => Promise<void>;
   defineSpace?: () => Promise<void>;
+
+  saveDeepmemoryTelegramToken?: (token: string) => Promise<void>;
+  telegramDeepmemoryBotStatus?: (status: boolean) => Promise<void>;
+  deepmemoryBotStatus?: (status: boolean) => Promise<void>;
+
   reset?: () => void;
 }
 
@@ -52,7 +63,15 @@ export function useInstaller() {
   return useContext(installerContext);
 }
 
-const fields = ['@deep-foundation/chatgpt-azure', '@deep-foundation/chatgpt-azure-deep', '@deep-foundation/chatgpt-azure-templates', '@deep-foundation/deepmemo-links'];
+const fields = [
+  '@deep-foundation/chatgpt-azure',
+  '@deep-foundation/chatgpt-azure-deep',
+  '@deep-foundation/chatgpt-azure-templates',
+  '@deep-foundation/voice-to-sync-text-file',
+  '@deep-foundation/deepmemo-links',
+  '@deep-foundation/telegram-bot',
+  '@deep-foundation/deepmemorybot',
+];
 
 export function InstallerProviderCore({
   children
@@ -73,21 +92,19 @@ export function InstallerProviderCore({
   const { data: UsesApiKey } = deep.useDeepId('@deep-foundation/openai', 'UsesApiKey');
   const { data: Model } = deep.useDeepId('@deep-foundation/openai', 'Model');
   const { data: UsesModel } = deep.useDeepId('@deep-foundation/openai', 'UsesModel');
+  const { data: TelegramToken } = deep.useDeepId('@deep-foundation/telegram-bot', 'Token');
+  const { data: TelegramActive } = deep.useDeepId('@deep-foundation/telegram-bot', 'Active');
+  const { data: DeepmemoryActive } = deep.useDeepId('@deep-foundation/deepmemorybot', 'Active');
 
-  const idsLoaded = ApiKey && UsesApiKey && Model && UsesModel;
+  const idsLoaded = ApiKey && UsesApiKey && Model && UsesModel && TelegramToken;
 
   deep.useDeepSubscription({
     type_id: deep.idLocal('@deep-foundation/core', 'Package'),
-    string: { value: { _in: [
-      '@deep-foundation/chatgpt-azure',
-      '@deep-foundation/chatgpt-azure-deep',
-      '@deep-foundation/chatgpt-azure-templates',
-      '@deep-foundation/deepmemo-links',
-    ] } }
+    string: { value: { _in: fields } }
   });
 
   deep.useDeepSubscription({
-    ...(idsLoaded ? { type_id: { _in: [ApiKey, UsesApiKey, Model, UsesModel] } } : { id: 0 }),
+    ...(idsLoaded ? { type_id: { _in: [ApiKey, UsesApiKey, Model, UsesModel, TelegramToken, TelegramActive] } } : { id: 0 }),
   });
 
   const { data: [space] } = deep.useDeepSubscription({
@@ -109,11 +126,17 @@ export function InstallerProviderCore({
     '@deep-foundation/chatgpt-azure': deep.useMinilinksSubscription(find('@deep-foundation/chatgpt-azure')).map(l => l.toPlain()),
     '@deep-foundation/chatgpt-azure-deep': deep.useMinilinksSubscription(find('@deep-foundation/chatgpt-azure-deep')).map(l => l.toPlain()),
     '@deep-foundation/chatgpt-azure-templates': deep.useMinilinksSubscription(find('@deep-foundation/chatgpt-azure-templates')).map(l => l.toPlain()),
+    '@deep-foundation/voice-to-sync-text-file': deep.useMinilinksSubscription(find('@deep-foundation/voice-to-sync-text-file')).map(l => l.toPlain()),
     '@deep-foundation/deepmemo-links': deep.useMinilinksSubscription(find('@deep-foundation/deepmemo-links')).map(l => l.toPlain()),
+    '@deep-foundation/telegram-bot': deep.useMinilinksSubscription(find('@deep-foundation/telegram-bot')).map(l => l.toPlain()),
+    '@deep-foundation/deepmemorybot': deep.useMinilinksSubscription(find('@deep-foundation/deepmemorybot')).map(l => l.toPlain()),
     'ApiKey': deep.useMinilinksSubscription({ type_id: ApiKey || 0 }).map(l => l.toPlain()),
     'UsesApiKey': deep.useMinilinksSubscription({ type_id: UsesApiKey || 0 }).map(l => l.toPlain()),
     'Model': deep.useMinilinksSubscription({ type_id: Model || 0 }).map(l => l.toPlain()),
     'UsesModel': deep.useMinilinksSubscription({ type_id: UsesModel || 0 }).map(l => l.toPlain()),
+    'TelegramToken': deep.useMinilinksSubscription({ type_id: TelegramToken || 0 }).map(l => l.toPlain()),
+    'TelegramActive': deep.useMinilinksSubscription({ type_id: TelegramActive || 0 }).map(l => l.toPlain()),
+    'DeepmemoryActive': deep.useMinilinksSubscription({ type_id: DeepmemoryActive || 0 }).map(l => l.toPlain()),
 
     space: space?.toPlain(),
     
@@ -169,9 +192,51 @@ export function InstallerProviderCore({
       await installPackage('@deep-foundation/chatgpt-azure');
       await installPackage('@deep-foundation/chatgpt-azure-deep');
       await installPackage('@deep-foundation/chatgpt-azure-templates');
+      await installPackage('@deep-foundation/voice-to-sync-text-file');
+      await installPackage('@deep-foundation/telegram-bot');
+      await installPackage('@deep-foundation/deepmemorybot');
+      await deep.insert({
+        type_id: await deep.id('@deep-foundation/telegram-bot', 'Bot'),
+        in: { data: [
+          {
+            type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId,
+            string: { data: { value: 'telegramBotDeepmemory' } },
+          },
+        ] },
+      });
+      await deep.insert({
+        type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
+        from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        in: { data: [
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+        ] },
+      });
+      await deep.insert({
+        type_id: await deep.id('@deep-foundation/telegram-bot', 'Token'),
+        string: { data: { value: '' } },
+        in: { data: [
+          {
+            type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId,
+            string: { data: { value: 'telegramBotDeepmemoryToken' } },
+          },
+        ] },
+      });
+
+      await deep.insert({
+        type_id: deep.idLocal('@deep-foundation/core', 'HandleInsert'),
+        from_id: deep.idLocal('@deep-foundation/core', 'AsyncFile'),
+        to_id: await deep.id('@deep-foundation/voice-to-sync-text-file', 'handler'),
+        in: { data: {
+          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId,
+        } },
+      });
+
       await installPackage('@deep-foundation/deepmemo-links');
       
       await value.defineSpace();
+
+      setInstalling(false);
     }
   };
 
@@ -201,6 +266,47 @@ export function InstallerProviderCore({
           },
         ] },
       });
+    }
+  }, [deep, value]);
+  value.saveDeepmemoryTelegramToken = useCallback(async (input: string) => {
+      await deep.update({ link_id: await deep.id(deep?.linkId, 'telegramBotDeepmemoryToken') }, { value: input }, { table: 'strings' });
+  }, [deep, value]);
+  value.telegramDeepmemoryBotStatus = useCallback(async (status: boolean) => {
+    const { data: [active] } = await deep.select({
+      type_id: await deep.id('@deep-foundation/telegram-bot', 'Active'),
+      from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+      to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemoryToken'),
+    });
+    if (status && !active) {
+      await deep.insert({
+        type_id: await deep.id('@deep-foundation/telegram-bot', 'Active'),
+        from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemoryToken'),
+        in: { data: [
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+        ] },
+      })
+    } else if (!status && !!active) {
+      await deep.delete(active.id);
+    }
+  }, [deep, value]);
+  value.deepmemoryBotStatus = useCallback(async (status: boolean) => {
+    const { data: [active] } = await deep.select({
+      type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
+      from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+      to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+    });
+    if (status && !active) {
+      await deep.insert({
+        type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
+        from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        in: { data: [
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+        ] },
+      })
+    } else if (!status && !!active) {
+      await deep.delete(active.id);
     }
   }, [deep, value]);
   value.saveUsesModel = useCallback(async (id: Id) => {
