@@ -31,6 +31,7 @@ interface InstallerContextData {
   '@deep-foundation/deepmemo-links'?: LinkPlain<Id>[];
   '@deep-foundation/telegram-bot'?: LinkPlain<Id>[];
   '@deep-foundation/deepmemorybot'?: LinkPlain<Id>[];
+  '@deep-foundation/semantic'?: LinkPlain<Id>[];
   'ApiKey'?: LinkPlain<Id>[];
   'UsesApiKey'?: LinkPlain<Id>[];
   'Model'?: LinkPlain<Id>[];
@@ -38,6 +39,7 @@ interface InstallerContextData {
   'TelegramToken'?: LinkPlain<Id>[];
   'TelegramActive'?: LinkPlain<Id>[];
   'DeepmemoryActive'?: LinkPlain<Id>[];
+  'semantic'?: LinkPlain<Id>[];
 
   space: LinkPlain<Id>;
 
@@ -48,7 +50,7 @@ interface InstallerContextData {
   install?: () => Promise<void>;
   saveApiKey?: (value: string) => Promise<void>;
   saveUsesModel?: (id: Id) => Promise<void>;
-  defineSpace?: () => Promise<void>;
+  defineSpace?: () => Promise<Id>;
 
   saveDeepmemoryTelegramToken?: (token: string) => Promise<void>;
   telegramDeepmemoryBotStatus?: (status: boolean) => Promise<void>;
@@ -71,6 +73,7 @@ const fields = [
   '@deep-foundation/deepmemo-links',
   '@deep-foundation/telegram-bot',
   '@deep-foundation/deepmemorybot',
+  '@deep-foundation/semantic',
 ];
 
 export function InstallerProviderCore({
@@ -95,8 +98,9 @@ export function InstallerProviderCore({
   const { data: TelegramToken } = deep.useDeepId('@deep-foundation/telegram-bot', 'Token');
   const { data: TelegramActive } = deep.useDeepId('@deep-foundation/telegram-bot', 'Active');
   const { data: DeepmemoryActive } = deep.useDeepId('@deep-foundation/deepmemorybot', 'Active');
+  const { data: Semantic } = deep.useDeepId('@deep-foundation/semantic', 'Semantic');
 
-  const idsLoaded = ApiKey && UsesApiKey && Model && UsesModel && TelegramToken;
+  const idsLoaded = ApiKey && UsesApiKey && Model && UsesModel && TelegramToken && Semantic;
 
   deep.useDeepSubscription({
     type_id: deep.idLocal('@deep-foundation/core', 'Package'),
@@ -104,7 +108,7 @@ export function InstallerProviderCore({
   });
 
   deep.useDeepSubscription({
-    ...(idsLoaded ? { type_id: { _in: [ApiKey, UsesApiKey, Model, UsesModel, TelegramToken, TelegramActive] } } : { id: 0 }),
+    ...(idsLoaded ? { type_id: { _in: [ApiKey, UsesApiKey, Model, UsesModel, TelegramToken, TelegramActive, Semantic] } } : { id: 0 }),
   });
 
   const { data: [space] } = deep.useDeepSubscription({
@@ -130,6 +134,7 @@ export function InstallerProviderCore({
     '@deep-foundation/deepmemo-links': deep.useMinilinksSubscription(find('@deep-foundation/deepmemo-links')).map(l => l.toPlain()),
     '@deep-foundation/telegram-bot': deep.useMinilinksSubscription(find('@deep-foundation/telegram-bot')).map(l => l.toPlain()),
     '@deep-foundation/deepmemorybot': deep.useMinilinksSubscription(find('@deep-foundation/deepmemorybot')).map(l => l.toPlain()),
+    '@deep-foundation/semantic': deep.useMinilinksSubscription(find('@deep-foundation/semantic')).map(l => l.toPlain()),
     'ApiKey': deep.useMinilinksSubscription({ type_id: ApiKey || 0 }).map(l => l.toPlain()),
     'UsesApiKey': deep.useMinilinksSubscription({ type_id: UsesApiKey || 0 }).map(l => l.toPlain()),
     'Model': deep.useMinilinksSubscription({ type_id: Model || 0 }).map(l => l.toPlain()),
@@ -137,6 +142,7 @@ export function InstallerProviderCore({
     'TelegramToken': deep.useMinilinksSubscription({ type_id: TelegramToken || 0 }).map(l => l.toPlain()),
     'TelegramActive': deep.useMinilinksSubscription({ type_id: TelegramActive || 0 }).map(l => l.toPlain()),
     'DeepmemoryActive': deep.useMinilinksSubscription({ type_id: DeepmemoryActive || 0 }).map(l => l.toPlain()),
+    'semantic': deep.useMinilinksSubscription({ type_id: Semantic || 0 }).map(l => l.toPlain()),
 
     space: space?.toPlain(),
     
@@ -154,6 +160,7 @@ export function InstallerProviderCore({
         string: { data: { value: 'deepmemo' } }
       } },
     });
+    return space?.id;
   }
 
   value.install = async () => {
@@ -161,13 +168,15 @@ export function InstallerProviderCore({
       setInstalling(true);
 
       const Install = await deep.id('@deep-foundation/npm-packager', 'Install');
+      
+      const spaceId = await value.defineSpace();
 
       await deep.insert({
         type_id: deep.idLocal('@deep-foundation/core', 'Join'),
         from_id: await deep.id('deep','users','packages'),
         to_id: deep?.linkId,
         in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
         ]}
       });
 
@@ -176,12 +185,12 @@ export function InstallerProviderCore({
           type_id: deep.idLocal('@deep-foundation/core', 'PackageQuery'),
           string: { data: { value: name } },
           in: { data: [
-            { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+            { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
             {
               type_id: Install,
               from_id: deep?.linkId,
               in: { data: [
-                { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+                { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
               ] },
             },
           ] },
@@ -199,17 +208,17 @@ export function InstallerProviderCore({
         type_id: await deep.id('@deep-foundation/telegram-bot', 'Bot'),
         in: { data: [
           {
-            type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId,
+            type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
             string: { data: { value: 'telegramBotDeepmemory' } },
           },
         ] },
       });
       await deep.insert({
         type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
-        from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
-        to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        from_id: await deep.id(spaceId, 'telegramBotDeepmemory'),
+        to_id: await deep.id(spaceId, 'telegramBotDeepmemory'),
         in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
         ] },
       });
       await deep.insert({
@@ -217,7 +226,7 @@ export function InstallerProviderCore({
         string: { data: { value: '' } },
         in: { data: [
           {
-            type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId,
+            type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
             string: { data: { value: 'telegramBotDeepmemoryToken' } },
           },
         ] },
@@ -228,13 +237,19 @@ export function InstallerProviderCore({
         from_id: deep.idLocal('@deep-foundation/core', 'AsyncFile'),
         to_id: await deep.id('@deep-foundation/voice-to-sync-text-file', 'handler'),
         in: { data: {
-          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId,
+          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
         } },
       });
 
       await installPackage('@deep-foundation/deepmemo-links');
-      
-      await value.defineSpace();
+
+      await installPackage('@deep-foundation/semantic');
+      await deep.insert({
+        type_id: await deep.id('@deep-foundation/semantic', 'Semantic'),
+        in: { data: [
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
+        ] },
+      });
 
       setInstalling(false);
     }
@@ -243,7 +258,7 @@ export function InstallerProviderCore({
   value.reset = useCallback(() => setInstalling(false), [value.status, installing]);
 
   value.saveApiKey = useCallback(async (input: string) => {
-    if (value.UsesApiKey.length) {
+    if (value.UsesApiKey.length && space) {
       await deep.update({ value: input }, { link_id: value.UsesApiKey[0].id });
     } else {
       await deep.insert({
@@ -254,62 +269,66 @@ export function InstallerProviderCore({
             type_id: UsesApiKey,
             from_id: value['@deep-foundation/chatgpt-azure-templates'][0].id,
             in: { data: [
-              { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+              { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: space?.id },
             ] },
           },
           {
             type_id: UsesApiKey,
             from_id: value['@deep-foundation/chatgpt-azure'][0].id,
             in: { data: [
-              { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+              { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: space?.id },
             ] },
           },
         ] },
       });
     }
-  }, [deep, value]);
+  }, [deep, value, space]);
   value.saveDeepmemoryTelegramToken = useCallback(async (input: string) => {
-      await deep.update({ link_id: await deep.id(deep?.linkId, 'telegramBotDeepmemoryToken') }, { value: input }, { table: 'strings' });
-  }, [deep, value]);
+    if (!space) return;
+    await deep.update({ link_id: await deep.id(space?.id, 'telegramBotDeepmemoryToken') }, { value: input }, { table: 'strings' });
+  }, [deep, value, space]);
   value.telegramDeepmemoryBotStatus = useCallback(async (status: boolean) => {
+    if (!space) return;
     const { data: [active] } = await deep.select({
       type_id: await deep.id('@deep-foundation/telegram-bot', 'Active'),
-      from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
-      to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemoryToken'),
+      from_id: await deep.id(space?.id, 'telegramBotDeepmemory'),
+      to_id: await deep.id(space?.id, 'telegramBotDeepmemoryToken'),
     });
     if (status && !active) {
       await deep.insert({
         type_id: await deep.id('@deep-foundation/telegram-bot', 'Active'),
-        from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
-        to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemoryToken'),
+        from_id: await deep.id(space?.id, 'telegramBotDeepmemory'),
+        to_id: await deep.id(space?.id, 'telegramBotDeepmemoryToken'),
         in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: space?.id },
         ] },
       })
     } else if (!status && !!active) {
       await deep.delete(active.id);
     }
-  }, [deep, value]);
+  }, [deep, value, space]);
   value.deepmemoryBotStatus = useCallback(async (status: boolean) => {
+    if (!space) return;
     const { data: [active] } = await deep.select({
       type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
-      from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
-      to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+      from_id: await deep.id(space?.id, 'telegramBotDeepmemory'),
+      to_id: await deep.id(space?.id, 'telegramBotDeepmemory'),
     });
     if (status && !active) {
       await deep.insert({
         type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
-        from_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
-        to_id: await deep.id(deep?.linkId, 'telegramBotDeepmemory'),
+        from_id: await deep.id(space?.id, 'telegramBotDeepmemory'),
+        to_id: await deep.id(space?.id, 'telegramBotDeepmemory'),
         in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
+          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: space?.id },
         ] },
       })
     } else if (!status && !!active) {
       await deep.delete(active.id);
     }
-  }, [deep, value]);
+  }, [deep, value, space]);
   value.saveUsesModel = useCallback(async (id: Id) => {
+    if (!space) return;
     await deep.delete({ _or: [
       { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), to: { type_id: UsesModel } },
       { type_id: UsesModel },
@@ -322,7 +341,7 @@ export function InstallerProviderCore({
         { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: deep?.linkId },
       ] },
     });
-  }, [deep, value]);
+  }, [deep, value, space]);
 
    return <>
     <installerContext.Provider value={value}>
