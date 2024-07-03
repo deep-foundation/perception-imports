@@ -108,7 +108,7 @@ export function InstallerProviderCore({
   });
 
   deep.useDeepSubscription({
-    ...(idsLoaded ? { type_id: { _in: [ApiKey, UsesApiKey, Model, UsesModel, TelegramToken, TelegramActive, Semantic] } } : { id: 0 }),
+    ...(idsLoaded ? { type_id: { _in: [ApiKey, UsesApiKey, Model, UsesModel, TelegramToken, TelegramActive, DeepmemoryActive, Semantic] } } : { id: 0 }),
   });
 
   const { data: [space] } = deep.useDeepSubscription({
@@ -354,5 +354,5 @@ export function InstallerProvider({
   children
 }: InstallerProviderProps) {
   const deep = useDeep();
-  return <>{!!deep ? <InstallerProviderCore>{children}</InstallerProviderCore> : children}</>
+  return <>{!!deep ? [<InstallerProviderCore key={`${deep?.linkId}-${deep?.client?.path}`}>{children}</InstallerProviderCore>] : children}</>
 }
