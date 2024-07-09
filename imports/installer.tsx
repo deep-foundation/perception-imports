@@ -5,7 +5,7 @@ import {
   createGeolocation,
   createGeolocationWatcher,
 } from "@solid-primitives/geolocation";
-import { useDeep } from '@deep-foundation/deeplinks/imports/client';
+import { DeepClientPathItem, useDeep } from '@deep-foundation/deeplinks/imports/client';
 import { Id, LinkPlain } from '@deep-foundation/deeplinks/imports/minilinks';
 import { useLocalStore } from '@deep-foundation/store/local';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -97,8 +97,8 @@ export function InstallerProviderCore({
   const { data: UsesModel } = deep.useDeepId('@deep-foundation/openai', 'UsesModel');
   const { data: TelegramToken } = deep.useDeepId('@deep-foundation/telegram-bot', 'Token');
   const { data: TelegramActive } = deep.useDeepId('@deep-foundation/telegram-bot', 'Active');
-  const { data: DeepmemoryActive } = deep.useDeepId('@deep-foundation/deepmemorybot', 'Active');
   const { data: Semantic } = deep.useDeepId('@deep-foundation/semantic', 'Semantic');
+  const { data: DeepmemoryActive } = deep.useDeepId('@deep-foundation/deepmemorybot', 'Active');
 
   const idsLoaded = ApiKey && UsesApiKey && Model && UsesModel && TelegramToken && Semantic;
 
@@ -133,8 +133,8 @@ export function InstallerProviderCore({
     '@deep-foundation/voice-to-sync-text-file': deep.useMinilinksSubscription(find('@deep-foundation/voice-to-sync-text-file')).map(l => l.toPlain()),
     '@deep-foundation/deepmemo-links': deep.useMinilinksSubscription(find('@deep-foundation/deepmemo-links')).map(l => l.toPlain()),
     '@deep-foundation/telegram-bot': deep.useMinilinksSubscription(find('@deep-foundation/telegram-bot')).map(l => l.toPlain()),
-    '@deep-foundation/deepmemorybot': deep.useMinilinksSubscription(find('@deep-foundation/deepmemorybot')).map(l => l.toPlain()),
     '@deep-foundation/semantic': deep.useMinilinksSubscription(find('@deep-foundation/semantic')).map(l => l.toPlain()),
+    '@deep-foundation/deepmemorybot': deep.useMinilinksSubscription(find('@deep-foundation/deepmemorybot')).map(l => l.toPlain()),
     'ApiKey': deep.useMinilinksSubscription({ type_id: ApiKey || 0 }).map(l => l.toPlain()),
     'UsesApiKey': deep.useMinilinksSubscription({ type_id: UsesApiKey || 0 }).map(l => l.toPlain()),
     'Model': deep.useMinilinksSubscription({ type_id: Model || 0 }).map(l => l.toPlain()),
@@ -171,6 +171,10 @@ export function InstallerProviderCore({
       
       const spaceId = await value.defineSpace();
 
+      const isExists = async (start, ...path: DeepClientPathItem[]) => {
+        try { return (!!await deep.id(start, ...path)); } catch(e) { return false; }
+      }
+
       await deep.insert({
         type_id: deep.idLocal('@deep-foundation/core', 'Join'),
         from_id: await deep.id('deep','users','packages'),
@@ -181,6 +185,7 @@ export function InstallerProviderCore({
       });
 
       const installPackage = async (name) => {
+        if (await isExists(name)) return;
         const { data: [chatgptAzure] } = await deep.insert({
           type_id: deep.idLocal('@deep-foundation/core', 'PackageQuery'),
           string: { data: { value: name } },
@@ -198,13 +203,17 @@ export function InstallerProviderCore({
         const { data: [chatgptAzureInstall] } = await deep.select({ to_id: chatgptAzure?.id, type_id: Install });
         await deep.await(chatgptAzureInstall?.id);
       };
+
+      await installPackage('@deep-foundation/unsafe');
+
       await installPackage('@deep-foundation/chatgpt-azure');
       await installPackage('@deep-foundation/chatgpt-azure-deep');
-      await installPackage('@deep-foundation/chatgpt-azure-templates');
       await installPackage('@deep-foundation/voice-to-sync-text-file');
+      await installPackage('@deep-foundation/chatgpt-azure-templates');
       await installPackage('@deep-foundation/telegram-bot');
       await installPackage('@deep-foundation/deepmemorybot');
-      await deep.insert({
+
+      if (!await isExists(spaceId, 'telegramBotDeepmemory')) await deep.insert({
         type_id: await deep.id('@deep-foundation/telegram-bot', 'Bot'),
         in: { data: [
           {
@@ -213,15 +222,16 @@ export function InstallerProviderCore({
           },
         ] },
       });
-      await deep.insert({
+      if (!await isExists(spaceId, 'deepmemorybotActive')) await deep.insert({
         type_id: await deep.id('@deep-foundation/deepmemorybot', 'Active'),
         from_id: await deep.id(spaceId, 'telegramBotDeepmemory'),
         to_id: await deep.id(spaceId, 'telegramBotDeepmemory'),
-        in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
-        ] },
+        in: { data: {
+          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
+          string: { data: { value: 'deepmemorybotActive' } },
+        } },
       });
-      await deep.insert({
+      if (!await isExists(spaceId, 'telegramBotDeepmemoryToken')) await deep.insert({
         type_id: await deep.id('@deep-foundation/telegram-bot', 'Token'),
         string: { data: { value: '' } },
         in: { data: [
@@ -232,23 +242,77 @@ export function InstallerProviderCore({
         ] },
       });
 
-      await deep.insert({
+      if (!await isExists(spaceId, 'voiceHandeInsert')) await deep.insert({
         type_id: deep.idLocal('@deep-foundation/core', 'HandleInsert'),
         from_id: deep.idLocal('@deep-foundation/core', 'AsyncFile'),
         to_id: await deep.id('@deep-foundation/voice-to-sync-text-file', 'handler'),
         in: { data: {
           type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
+          string: { data: { value: 'voiceHandeInsert' } },
         } },
       });
 
       await installPackage('@deep-foundation/deepmemo-links');
 
       await installPackage('@deep-foundation/semantic');
-      await deep.insert({
-        type_id: await deep.id('@deep-foundation/semantic', 'Semantic'),
-        in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
+
+      if (!await isExists(spaceId, 'semanticUnsafeRule')) await deep.insert({
+        type_id: deep.idLocal('@deep-foundation/core', 'Rule'),
+        in: { data: {
+          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
+          string: { data: { value: 'semanticUnsafeRule' } },
+        } },
+        out: { data: [
+          {
+            type_id: deep.idLocal('@deep-foundation/core', 'RuleSubject'),
+            to: { data: {
+              type_id: deep.idLocal('@deep-foundation/core', 'Selector'),
+              out: { data: {
+                type_id: deep.idLocal('@deep-foundation/core', 'SelectorInclude'),
+                to_id: await deep.id('@deep-foundation/semantic'),
+                out: { data: {
+                  type_id: deep.idLocal('@deep-foundation/core', 'SelectorTree'),
+                  to_id: deep.idLocal('@deep-foundation/core', 'joinTree'),
+                } },
+              } }
+            } }
+          },
+          {
+            type_id: deep.idLocal('@deep-foundation/core', 'RuleObject'),
+            to: { data: {
+              type_id: deep.idLocal('@deep-foundation/core', 'Selector'),
+              out: { data: {
+                type_id: deep.idLocal('@deep-foundation/core', 'SelectorInclude'),
+                to_id: await deep.id('@deep-foundation/semantic'),
+                out: { data: {
+                  type_id: deep.idLocal('@deep-foundation/core', 'SelectorTree'),
+                  to_id: deep.idLocal('@deep-foundation/core', 'containTree'),
+                } },
+              } }
+            } }
+          },
+          {
+            type_id: deep.idLocal('@deep-foundation/core', 'RuleAction'),
+            to: { data: {
+              type_id: deep.idLocal('@deep-foundation/core', 'Selector'),
+              out: { data: {
+                type_id: deep.idLocal('@deep-foundation/core', 'SelectorInclude'),
+                to_id: deep.idLocal('@deep-foundation/unsafe', 'AllowUnsafe'),
+                out: { data: {
+                  type_id: deep.idLocal('@deep-foundation/core', 'SelectorTree'),
+                  to_id: deep.idLocal('@deep-foundation/core', 'containTree'),
+                } },
+              } }
+            } }
+          },
         ] },
+      });
+      if (!await isExists(spaceId, 'semantic')) await deep.insert({
+        type_id: await deep.id('@deep-foundation/semantic', 'Semantic'),
+        in: { data: {
+          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
+          string: { data: { value: 'semantic' } },
+        } },
       });
 
       setInstalling(false);
