@@ -179,9 +179,10 @@ export function InstallerProviderCore({
         type_id: deep.idLocal('@deep-foundation/core', 'Join'),
         from_id: await deep.id('deep','users','packages'),
         to_id: deep?.linkId,
-        in: { data: [
-          { type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId },
-        ]}
+        in: { data: {
+          type_id: deep.idLocal('@deep-foundation/core', 'Contain'), from_id: spaceId,
+          string: { data: { value: 'packagesJoin' } },
+        } }
       });
 
       const installPackage = async (name) => {
