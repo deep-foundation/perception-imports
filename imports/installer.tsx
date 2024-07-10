@@ -152,7 +152,12 @@ export function InstallerProviderCore({
   value.installed = fields.every(key => !!value[key]?.length);
   value.status = value.installed && value.isAdmin;
 
+  const isExists = async (start, ...path: DeepClientPathItem[]) => {
+    try { return (!!await deep.id(start, ...path)); } catch(e) { return false; }
+  }
+
   value.defineSpace = async () => {
+    try { return await deep.id(deep.linkId, 'deepmemo'); } catch(e) {}
     const { data: [space] } =await deep.insert({
       type_id: deep.idLocal('@deep-foundation/core', 'Space'),
       in: { data: {
@@ -171,11 +176,7 @@ export function InstallerProviderCore({
       
       const spaceId = await value.defineSpace();
 
-      const isExists = async (start, ...path: DeepClientPathItem[]) => {
-        try { return (!!await deep.id(start, ...path)); } catch(e) { return false; }
-      }
-
-      await deep.insert({
+      if (!await isExists(spaceId, 'packagesJoin')) await deep.insert({
         type_id: deep.idLocal('@deep-foundation/core', 'Join'),
         from_id: await deep.id('deep','users','packages'),
         to_id: deep?.linkId,
