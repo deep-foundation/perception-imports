@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -46,6 +46,7 @@
     "@capacitor/geolocation": "^5.0.7",
     "@chakra-ui/react": "^2.8.2",
     "@chakra-ui/theme-tools": "^2.1.2",
+    "@deep-foundation/store": "^0.0.31",
     "@solid-primitives/geolocation": "^1.4.14",
     "base64-blob": "^1.4.1",
     "capacitor-voice-recorder": "^5.0.0"
