@@ -299,7 +299,7 @@ export function InstallerProviderCore({
               type_id: deep.idLocal('@deep-foundation/core', 'Selector'),
               out: { data: {
                 type_id: deep.idLocal('@deep-foundation/core', 'SelectorInclude'),
-                to_id: deep.idLocal('@deep-foundation/unsafe', 'AllowUnsafe'),
+                to_id: await deep.id('@deep-foundation/unsafe', 'AllowUnsafe'),
                 out: { data: {
                   type_id: deep.idLocal('@deep-foundation/core', 'SelectorTree'),
                   to_id: deep.idLocal('@deep-foundation/core', 'containTree'),
