@@ -52,8 +52,8 @@ const theme = extendTheme({
         _dark: 'deep.700',
       },
       deepBgActive: {
-        default: 'deep.50',
-        _dark: 'deep.900',
+        default: 'deep.100',
+        _dark: 'deep.800',
       },
       deepColorActive: {
         default: '#00438F',
