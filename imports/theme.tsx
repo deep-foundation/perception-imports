@@ -92,6 +92,13 @@ const theme = extendTheme({
     },
   },
   components: {
+    Popover: {
+      baseStyle: {
+        content: {
+          borderRadius: 0,
+        },
+      },
+    },
     Input: {
       baseStyle: {
         field: {
