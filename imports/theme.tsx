@@ -47,6 +47,10 @@ const theme = extendTheme({
         default: 'deep.900',
         _dark: 'deep.50',
       },
+      deepColorDisabled: {
+        default: 'deep.700',
+        _dark: 'deep.700',
+      },
       deepBgActive: {
         default: 'deep.50',
         _dark: 'deep.900',
@@ -113,6 +117,13 @@ const theme = extendTheme({
           color: 'deepColorActive',
           _hover: {
             bg: 'deepBgActiveHover',
+          },
+        },
+        disabled: {
+          bg: 'deepBg',
+          color: 'deepColorDisabled',
+          _hover: {
+            bg: 'deepBg',
           },
         },
         // baseStyle: (props: StyleFunctionProps) => ({
