@@ -127,7 +127,29 @@ const theme = extendTheme({
       baseStyle: {
         field: {
           borderRadius: 0,
-          color: 'deepColor'
+          color: 'deepColor',
+          p: '1em',
+        },
+      },
+    },
+    Textarea: {
+      baseStyle: {
+        borderRadius: 0,
+        color: 'deepColor',
+        p: '1em',
+      },
+    },
+    Modal: {
+      baseStyle: {
+        header: {
+          position: 'absolute',
+          bottom: '100%',
+          left: 0,
+          p: 0,
+        },
+        dialog: {
+          borderRadius: 0,
+          bg: 'deepBg'
         },
       },
     },
