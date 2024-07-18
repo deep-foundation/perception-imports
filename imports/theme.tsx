@@ -51,14 +51,6 @@ const theme = extendTheme({
         default: 'deep.700',
         _dark: 'deep.700',
       },
-      deepBgActive: {
-        default: 'deep.100',
-        _dark: 'deep.800',
-      },
-      deepColorActive: {
-        default: '#00438F',
-        _dark: 'cyan',
-      },
       deepBgHover: {
         default: 'deep.100',
         _dark: 'deep.800',
@@ -66,6 +58,26 @@ const theme = extendTheme({
       deepColorHover: {
         default: 'deep.900',
         _dark: 'deep.50',
+      },
+      deepBgDanger: {
+        default: 'danger.50',
+        _dark: 'danger.800',
+      },
+      deepColorDanger: {
+        default: 'danger.900',
+        _dark: 'danger.50',
+      },
+      deepBgDangerHover: {
+        default: 'danger.100',
+        _dark: 'danger.800',
+      },
+      deepBgActive: {
+        default: 'deep.100',
+        _dark: 'deep.800',
+      },
+      deepColorActive: {
+        default: '#00438F',
+        _dark: 'cyan',
       },
       deepBgActiveHover: {
         default: 'deep.100',
@@ -89,6 +101,18 @@ const theme = extendTheme({
       700: '#2C5282',
       800: '#1B2535',
       900: '#19202B',
+    },
+    danger: {
+      50: '#edd2d2',
+      100: '#EE7474',
+      200: '#D26969',
+      300: '#BB3737', //
+      400: '#AD2626',
+      500: '#881111', //
+      600: '#6B0A0A',
+      700: '#440606',
+      800: '#3c1515',
+      900: '#1F0505',
     },
   },
   components: {
@@ -124,6 +148,13 @@ const theme = extendTheme({
           color: 'deepColorActive',
           _hover: {
             bg: 'deepBgActiveHover',
+          },
+        },
+        danger: {
+          bg: 'deepBgDanger',
+          color: 'deepColorDanger',
+          _hover: {
+            bg: 'deepBgDangerHover',
           },
         },
         disabled: {
