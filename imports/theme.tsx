@@ -99,6 +99,10 @@ const theme = extendTheme({
         default: '#00438F',
         _dark: 'cyan',
       },
+      splash: {
+        default: '#0D1117',
+        _dark: 'deep.50',
+      },
     }
   },
   colors: {
