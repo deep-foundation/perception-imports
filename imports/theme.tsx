@@ -71,6 +71,18 @@ const theme = extendTheme({
         default: 'danger.100',
         _dark: 'danger.800',
       },
+      deepBgDangerActive: {
+        default: 'danger.100',
+        _dark: 'danger.900',
+      },
+      deepColorDangerActive: {
+        default: 'danger.900',
+        _dark: 'danger.50',
+      },
+      deepBgDangerActiveHover: {
+        default: 'danger.200',
+        _dark: 'danger.700',
+      },
       deepBgActive: {
         default: 'deep.100',
         _dark: 'deep.800',
@@ -177,6 +189,13 @@ const theme = extendTheme({
           color: 'deepColorDanger',
           _hover: {
             bg: 'deepBgDangerHover',
+          },
+        },
+        dangerActive: {
+          bg: 'deepBgDangerActive',
+          color: 'deepColorDangerActive',
+          _hover: {
+            bg: 'deepBgDangerActiveHover',
           },
         },
         disabled: {
