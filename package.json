@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
     "package:app:dev": "npm run package:app:sync; (cd ../perception-app; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
-    "@deep-foundation/deeplinks": "^0.0.390",
+    "@deep-foundation/deeplinks": "^0.0.392",
     "react": "^18.3.1"
   },
   "engines": {
