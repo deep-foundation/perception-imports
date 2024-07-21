@@ -43,6 +43,10 @@ const theme = extendTheme({
         default: 'deep.50',
         _dark: 'deep.900',
       },
+      deepBgDark: {
+        default: 'white',
+        _dark: 'deep.950',
+      },
       deepColor: {
         default: 'deep.900',
         _dark: 'deep.50',
@@ -117,6 +121,7 @@ const theme = extendTheme({
       700: '#2C5282',
       800: '#1B2535',
       900: '#19202B',
+      950: '#070A0D',
     },
     danger: {
       50: '#edd2d2',
@@ -136,6 +141,7 @@ const theme = extendTheme({
       baseStyle: {
         content: {
           borderRadius: 0,
+          bg: 'deepBg',
         },
       },
     },
