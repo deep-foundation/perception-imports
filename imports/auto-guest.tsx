@@ -38,6 +38,6 @@ export const AutoGuest = React.memo(function AutoGuest({
     setIsAuth(isAuth);
   }, [token, deep?.linkId]);
   return <>
-    {isAuth ? children : null}
+    {isAuth ? children || null : null}
   </>
 });
