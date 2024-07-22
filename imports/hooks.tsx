@@ -21,17 +21,10 @@ export function useCanByContain(id: Id) {
       },
     },
   });
-  console.log(data);
-  return !!data.length;
+  return !!data?.length;
 }
 
 export function useChakraColor(color: string) {
   const theme = useTheme();
   return theme.__cssMap[`colors.${color}`]?.value;
-}
-
-export function useChakraGlobal() {
-  const theme = useTheme();
-  const { colorMode } = useColorMode();
-  return theme.styles.global({ colorMode });
 }
