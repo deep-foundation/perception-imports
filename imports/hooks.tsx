@@ -1,5 +1,6 @@
 import { useDeep } from "@deep-foundation/deeplinks/imports/client";
 import { Id } from "@deep-foundation/deeplinks/imports/minilinks";
+import { useTheme, useColorMode } from '@chakra-ui/react';
 
 export function useCanByContain(id: Id) {
   const deep = useDeep();
@@ -21,4 +22,15 @@ export function useCanByContain(id: Id) {
     },
   });
   return !!result;
+}
+
+export function useChakraColor(color: string) {
+  const theme = useTheme();
+  return theme.__cssMap[`colors.${color}`]?.value;
+}
+
+export function useChakraGlobal() {
+  const theme = useTheme();
+  const { colorMode } = useColorMode();
+  return theme.styles.global({ colorMode });
 }
