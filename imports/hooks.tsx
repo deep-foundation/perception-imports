@@ -4,7 +4,7 @@ import { useTheme, useColorMode } from '@chakra-ui/react';
 
 export function useCanByContain(id: Id) {
   const deep = useDeep();
-  const { data: [result] } = deep.useQuery({
+  const { data } = deep.useQuery({
     id: id,
     up: {
       tree_id: deep.idLocal('@deep-foundation/core', 'containTree'),
@@ -21,7 +21,8 @@ export function useCanByContain(id: Id) {
       },
     },
   });
-  return !!result;
+  console.log(data);
+  return !!data.length;
 }
 
 export function useChakraColor(color: string) {
