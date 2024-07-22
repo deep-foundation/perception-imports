@@ -1,16 +1,16 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
-    "package:build": "tsc --project tsconfig.json",
-    "package:watch": "tsc -w --project tsconfig.json",
-    "package:unbuild": "rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && (cd ./migrations && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports/gql && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./benchmarks && rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts && cd ..) && (cd ./imports/router && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./tests && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../)",
-    "package:publish": "npm run package:build && npm publish --access public && npm run package:unbuild",
-    "package:release": "npm version patch && git push",
-    "package:app:sync": "npm run package:build; sudo apt-get -y install rsync; rsync -a ./imports ../perception-app/node_modules/@deep-foundation/perception-imports/;",
-    "package:app:dev": "npm run package:app:sync; (cd ../; rm -rf app; npm run dev)"
+    "build": "tsc --project tsconfig.json",
+    "watch": "tsc -w --project tsconfig.json",
+    "unbuild": "rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && (cd ./migrations && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports/gql && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./benchmarks && rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts && cd ..) && (cd ./imports/router && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./tests && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../)",
+    "publish": "npm run build && npm publish --access public && npm run unbuild",
+    "release": "npm version patch && git push",
+    "app:sync": "npm run build; sudo apt-get -y install rsync; rsync -a ./imports ../perception-app/node_modules/@deep-foundation/perception-imports/;",
+    "app:dev": "npm run app:sync; (cd ../; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
     "@deep-foundation/deeplinks": "^0.0.394",
