@@ -103,6 +103,26 @@ const theme = extendTheme({
         default: '#00438F',
         _dark: 'cyan',
       },
+      deepLine: {
+        default: 'deep.100',
+        _dark: 'deep.800',
+      },
+      deepLinkNodeBg: {
+        default: 'deep.900',
+        _dark: 'white',
+      },
+      deepLinkNodeColor: {
+        default: 'deep.950',
+        _dark: 'deep.50',
+      },
+      deepLinkNodeBgActive: {
+        default: 'deep.800',
+        _dark: 'deep.100',
+      },
+      deepLinkNodeColorActive: {
+        default: 'deep.950',
+        _dark: 'cyan',
+      },
       splash: {
         default: '#0D1117',
         _dark: 'deep.50',
@@ -213,6 +233,26 @@ const theme = extendTheme({
           color: 'deepColorDisabled',
           _hover: {
             bg: 'deepBg',
+          },
+        },
+        planet: {
+          bg: 'deepBg',
+          color: 'deepColor',
+          opacity: 0.8,
+          borderColor: 'deepColor',
+          borderStyle: 'deshed',
+          borderWidth: '1px',
+          borderRadius: '50%',
+          height: '3em', width: '3em',
+          _hover: {
+            bg: 'deepBgDark',
+          },
+        },
+        planetActive: {
+          bg: '#fff',
+          color: 'deepColorActive',
+          _hover: {
+            bg: 'deepBgActiveHover',
           },
         },
         // baseStyle: (props: StyleFunctionProps) => ({

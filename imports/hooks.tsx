@@ -28,3 +28,7 @@ export function useChakraColor(color: string) {
   const theme = useTheme();
   return theme.__cssMap[`colors.${color}`]?.value;
 }
+
+export function getChakraVar(e, v) {
+  return typeof(window) === 'object' ? (window.getComputedStyle(e).getPropertyValue(v.split(4, -1))) : ('transparent');
+}
