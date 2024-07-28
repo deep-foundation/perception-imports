@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -9,11 +9,11 @@
     "unbuild": "rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && (cd ./migrations && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../) && (cd ./imports/gql && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./benchmarks && rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts && cd ..) && (cd ./imports/router && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../..) && (cd ./tests && rimraf ./*.js && rimraf ./*.js.map && rimraf ./*.d.ts && cd ../)",
     "publish": "npm run build && npm publish --access public && npm run unbuild",
     "release": "npm version patch && git push",
-    "app:sync": "npm run build; sudo apt-get -y install rsync; rsync -a ./imports ../node_modules/@deep-foundation/perception-imports/;",
+    "app:sync": "npm run build; rsync -a ./imports ../node_modules/@deep-foundation/perception-imports/;",
     "app:dev": "npm run app:sync; (cd ../; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
-    "@deep-foundation/deeplinks": "^0.0.398",
+    "@deep-foundation/deeplinks": "^0.0.402",
     "react": "^18.3.1"
   },
   "engines": {
