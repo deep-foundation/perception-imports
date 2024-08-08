@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "license": "Unlicense",
   "type": "module",
   "scripts": {
@@ -46,9 +46,23 @@
     "@capacitor/geolocation": "^5.0.7",
     "@chakra-ui/react": "^2.8.2",
     "@chakra-ui/theme-tools": "^2.1.2",
+    "@codemirror/commands": "^6.6.0",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lint": "^6.8.1",
+    "@codemirror/view": "^6.30.0",
     "@deep-foundation/store": "^0.0.31",
+    "@monaco-editor/react": "^4.6.0",
     "@solid-primitives/geolocation": "^1.4.14",
+    "@uiw/codemirror-extensions-langs": "^4.23.0",
+    "@uiw/codemirror-theme-github": "^4.23.0",
+    "@uiw/react-codemirror": "^4.23.0",
     "base64-blob": "^1.4.1",
-    "capacitor-voice-recorder": "^5.0.0"
+    "capacitor-voice-recorder": "^5.0.0",
+    "classnames": "^2.5.1",
+    "eslint-linter-browserify": "^9.8.0",
+    "jquery": "^3.7.1",
+    "react-hotkeys-hook": "^4.5.0",
+    "react-icons": "^5.2.1",
+    "react-resize-detector": "^11.0.1"
   }
 }
