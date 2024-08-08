@@ -39,6 +39,10 @@ const theme = extendTheme({
   config,
   semanticTokens: {
     colors: {
+      deepBgGraphChildren: {
+        default: 'black',
+        _dark: 'white',
+      },
       deepBg: {
         default: 'deep.50',
         _dark: 'deep.900',
