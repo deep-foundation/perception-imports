@@ -1,7 +1,7 @@
 import { useDeep } from '@deep-foundation/deeplinks/imports/client';
 import { Id, Link } from '@deep-foundation/deeplinks/imports/minilinks';
-import { createContext, memo, useCallback, useEffect, useRef, useState } from 'react';
-import { ClientHandler, HandlersGoContext, useFindClientHandler, useHandlersGo } from './client-handler';
+import { createContext, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ClientHandler, HandlerConfigContext, HandlersGoContext, useFindClientHandler, useHandlersGo } from './client-handler';
 
 import { Alert, AlertIcon, AlertTitle, Box, Button, Flex, Modal, ModalBody, ModalContent, ModalOverlay, Skeleton, useDisclosure, VStack } from '@chakra-ui/react';
 import React from 'react';
@@ -63,9 +63,14 @@ export function ClientHandlerErrorComponent({
   const content = { src, dist };
   const disclosure = useDisclosure();
   const _mode = content[mode] ? mode : 'dist';
+  const go = useGoCore();
+  const ref = useMemo(() => go?.root().ref, []);
   return <>
     <Button w='100%' h='100%' variant='danger' onClick={disclosure.onOpen}>error</Button>
-    <Modal blockScrollOnMount={false} isOpen={disclosure.isOpen} onClose={disclosure.onClose}>
+    <Modal
+      blockScrollOnMount={false} isOpen={disclosure.isOpen} onClose={disclosure.onClose}
+      portalProps={{ containerRef: ref }}
+    >
       <ModalOverlay />
       <ModalContent maxW='90%' maxH='90%' h='100%' opacity={0.9}>
         <ModalBody p='1em'>
@@ -158,9 +163,11 @@ export const ReactHandlersContext = createContext<any>(undefined);
 export function ReactHandlersProvider({
   children = null,
   requires = {},
+  sync: _sync = false,
 }: {
   children?: any;
   requires?: any;
+  sync?: boolean;
 }) {
   r.requires = requires;
   const deep = useDeep();
@@ -233,9 +240,17 @@ export function ReactHandlersProvider({
     })
   };
   const goRoot = focuses?.[0]?.go?.root();
+  const [sync, setSync] = useState(_sync);
+
   return <ReactHandlersContext.Provider value={focusedRef}>
+    <HandlerConfigContext.Provider value={{ sync, setSync }}>
     {children}
-    {!!focuses.length && <VStack position='fixed' top='0' right='0' zIndex={9999} alignItems={'end'} pointerEvents='none' userSelect={'none'}>
+    {!!focuses.length && <VStack
+      position='fixed' top='0' right='0' zIndex={9999}
+      alignItems={'end'} pointerEvents='none' userSelect={'none'}
+      overflowY='scroll' css={goRoot.noScrollBar}
+    >
+      <Box h='100%' w='3em' pointerEvents='none'></Box>
       <Button bg='deepBgDark' size='md' pointerEvents='all' onClick={() => {
         setFocuses([]);
       }}>X</Button>
@@ -245,6 +260,7 @@ export function ReactHandlersProvider({
       {!!goRoot && renderFocuses([{ handlerId: goRoot?.linkId, go: goRoot }], 0, 'go')}
     </VStack>}
     {!!handler && [<ReactHandlerEditor key={handler?.id} disclosure={disclosure} handler={handler}/>]}
+    </HandlerConfigContext.Provider>
   </ReactHandlersContext.Provider>;
 }
 

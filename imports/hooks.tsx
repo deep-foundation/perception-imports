@@ -21,7 +21,7 @@ export function Packages() {
       tree_id: { _eq: deep.idLocal('@deep-foundation/core', 'containTree') },
       parent: {
         type_id: { _eq: deep.idLocal('@deep-foundation/core', 'Package') },
-        string: {}
+        string: { value: { _neq: 'deep' } },
       },
     },
   });
@@ -106,7 +106,7 @@ export function PreloadProvider({
   children?: any;
  }) {
   const deep = useDeep();
-  return deep ? <PreloadProviderCore preloaded={preloaded} children={children}/> : children;
+  return deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children;
 }
 
 export function useSymbol() {

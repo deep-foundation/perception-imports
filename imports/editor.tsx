@@ -26,7 +26,7 @@ interface IEditor {
   onClose?: () => void;
   onExit?: () => void;
   minimap?: boolean;
-  lineNumbers?: string;
+  lineNumbers?: boolean;
   defaultLanguage?: string;
   fillSize?: boolean;
   onMount?: (editor: any, monaco: any) => any;
@@ -63,7 +63,7 @@ export const Editor = React.memo(function Editor({
   onExit,
   saveButton = true,
   minimap = true,
-  lineNumbers = 'on',
+  lineNumbers,
   defaultLanguage = "javascript",
   fillSize = false,
   onMount,
@@ -88,12 +88,12 @@ export const Editor = React.memo(function Editor({
   const { data: [link] } = useLoad({ id: linkId });
 
   const update = useCallback(() => {
-    if (linkId) deep.value(linkId, v);
+    if (linkId && v?.length > 0) deep.value(linkId, v);
     onSave && onSave(v)
   }, [link, v]);
 
   const customKeymap = useMemo(() => {
-  const save = (editor) => {
+    const save = (editor) => {
       update();
       return true;
     };
@@ -116,6 +116,7 @@ export const Editor = React.memo(function Editor({
   const basicSetup = useMemo(() => ({
     tabSize: 2,
     // @ts-ignore
+    lineNumbers,
     lineWrapping: true,
     ...(props?.basicSetup || {}),
   }), [props?.basicSetup]);
@@ -129,7 +130,7 @@ export const Editor = React.memo(function Editor({
     <Box {...(fillSize ? { position: 'absolute', left: '0', top: '0', right: '0', bottom: '0' } : {})} w='100%'>
       {(linkId ? !!link : true) && <ReactCodeMirror
         ref={eref}
-        value={(linkId ? deep.stringify(link?.value?.value) || startValue : startValue) || ''}
+        value={props?.editable !== false && !props?.readOnly ? (linkId ? deep.stringify(link?.value?.value) || startValue : startValue) || '' : value}
         theme={colorMode === 'light' ? githubLight : githubDark}
         extensions={extensions}
         basicSetup={basicSetup}
@@ -140,7 +141,7 @@ export const Editor = React.memo(function Editor({
     </Box>
     <VStack position='absolute' right='1em' top='1em' overflow='hidden'>
       {children}
-      {!!saveButton && <Button
+      {!!saveButton && props?.editable !== false && !props?.readOnly && <Button
         w='3em' h='3em'
         transition='all 1s ease'
         position='relative' left={!subscription || !isEqual(v, link?.value?.value || value) ? '10em' : '0em'}

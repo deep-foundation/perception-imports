@@ -3,6 +3,7 @@ import { Id, Link } from '@deep-foundation/deeplinks/imports/minilinks';
 import { DeepClient, useDeep } from '@deep-foundation/deeplinks/imports/client';
 import { gql } from '@apollo/client/index';
 import $ from 'jquery';
+import isEqual from 'lodash/isEqual';
 
 import React from 'react';
 import { WatchLink } from './react-handler';
@@ -181,7 +182,13 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
   </>);
 });
 
+export const HandlerConfigContext = createContext<{
+  sync: boolean;
+  setSync: React.Dispatch<React.SetStateAction<boolean>>;
+}>({ sync: false, setSync: (value) => {} });
+
 export function useClientHandler(_props: UseClientHandlerProps) {
+  const { sync: __sync = false } = useContext(HandlerConfigContext);
   const {
     link: _link,
     linkId: _linkId,
@@ -190,7 +197,7 @@ export function useClientHandler(_props: UseClientHandlerProps) {
     onClose,
     error: outerError,
     require,
-    sync: _sync = true,
+    sync: _sync = __sync,
     ...props
   } = _props;
   const deep = useDeep();
@@ -226,7 +233,7 @@ export function useClientHandler(_props: UseClientHandlerProps) {
         if (evalId === lastEvalRef.current) {
           // console.log('ClientHandler evalClientHandler setState', { file, data, error });
           if (!error) {
-            setState(() => ({ Component: React.forwardRef(data) }));
+            setState(() => ({ Component: React.memo(React.forwardRef(data), isEqual) }));
             erroredResetRef?.current && (erroredResetRef?.current(), erroredResetRef.current = undefined);
           }
           else {
@@ -340,10 +347,10 @@ export function useFindClientHandler({
   const deep = useDeep();
   const [asyncHandler, setAsyncHandler] = useState<any>();
   const handlers = useHandlersContext();
-  if (!deep.isId(handlerId)) throw new Error(`useFindClient !handlerId ${deep.stringify(handlerId)}`);
+  // if (!deep.isId(handlerId)) throw new Error(`useFindClientHandler !handlerId ${deep.stringify(handlerId)}`);
   const memoHandler = useMemo(() => {
     // console.log(handlers, handlerId);
-    return handlers.current.find(h => h.handler_id === handlerId);
+    return handlerId ? handlers.current.find(h => h.handler_id === handlerId) : undefined;
   }, [handlerId]);
   useEffect(() => {
     // if (memoHandler) console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} founded sync`);
@@ -354,10 +361,12 @@ export function useFindClientHandler({
         ...handlerQuery,
       }))?.data : [];
       const _handlerId = handlerId || handlerIds[0]?.id;
-      const handler = await deep._findHandler({ context, handlerId: _handlerId });
-      if (handler) {
-        setAsyncHandler(handler);
-        // console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} founded async`);
+      if (deep.isId(_handlerId)) {
+        const handler = await deep._findHandler({ context, handlerId: _handlerId });
+        if (handler) {
+          setAsyncHandler(handler);
+          // console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} founded async`);
+        }
       }
       // console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} not founded async`);
     })();

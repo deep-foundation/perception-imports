@@ -29,14 +29,12 @@ export const ColorMode = ({
   )
 }
 
-const config: ThemeConfig = {
-  initialColorMode: 'dark',
-  useSystemColorMode: true,
-  cssVarPrefix: 'deepCase',
-}
-
 const theme = extendTheme({
-  config,
+  config: {
+    initialColorMode: 'dark',
+    useSystemColorMode: true,
+    cssVarPrefix: 'deepCase',
+  },
   semanticTokens: {
     colors: {
       deepBgGraphChildren: {
@@ -163,9 +161,18 @@ const theme = extendTheme({
   components: {
     Popover: {
       baseStyle: {
+        header: {
+          border: 0,
+        },
         content: {
+          boxShadow: 'dark-lg',
+          border: 0,
           borderRadius: 0,
           bg: 'deepBg',
+          color: 'deepColor',
+        },
+        arrow: {
+          bg: 'deepColorActive',
         },
       },
     },
@@ -253,8 +260,14 @@ const theme = extendTheme({
           },
         },
         planetActive: {
-          bg: '#fff',
+          bg: '#ffffff42',
           color: 'deepColorActive',
+          opacity: 0.8,
+          borderColor: 'deepColor',
+          borderStyle: 'deshed',
+          borderWidth: '1px',
+          borderRadius: '50%',
+          height: '3em', width: '3em',
           _hover: {
             bg: 'deepBgActiveHover',
           },

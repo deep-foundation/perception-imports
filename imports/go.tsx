@@ -8,7 +8,7 @@ import EventEmitter from 'events';
 import isEqual from 'lodash/isEqual';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { HandlersGoContext, useClientHandler } from './client-handler';
+import { HandlerConfigContext, HandlersGoContext, useClientHandler } from './client-handler';
 import { Editor } from './editor';
 import { ReactHandler } from './react-handler';
 
@@ -71,6 +71,7 @@ export interface GoI {
   useCookiesStore: typeof useCookiesStore;
   getChakraVar: typeof getChakraVar;
   useChakraColor: typeof useChakraColor;
+  HandlerConfigContext: typeof HandlerConfigContext;
   Component: typeof Component;
   useHook: typeof useHook;
   Query: typeof Query;
@@ -82,8 +83,12 @@ export interface GoI {
   noScrollBar: typeof noScrollBar;
   context: GoContextI;
 
+  activator: typeof activator;
   next: typeof next;
   prev: typeof prev;
+
+  delay: typeof delay;
+  useRefValue: typeof useRefValue;
 
   _focus?: any;
   _setValue?: any;
@@ -244,6 +249,7 @@ export const GoProvider = memo(function GoProvider({
     go.useCookiesStore = useCookiesStore;
     go.getChakraVar = getChakraVar;
     go.useChakraColor = useChakraColor;
+    go.HandlerConfigContext = HandlerConfigContext;
     go.Component = Component;
     go.useHook = useHook;
     go.useLoader = useLoader;
@@ -262,8 +268,13 @@ export const GoProvider = memo(function GoProvider({
     go.await = _await;
     go.awaitRef = _awaitRef;
     go.all = all;
+
+    go.activator = activator;
     go.next = next;
     go.prev = prev;
+
+    go.delay = delay;
+    go.useRefValue = useRefValue;
 
     go._setValue = setValue;
     go.hgo = hgo;
@@ -384,6 +395,14 @@ const On = function On(on) {
   return on?.children || null;
 }
 
+const delay = (time) => new Promise((res) => setTimeout(() => res(true), time));
+
+function useRefValue(value) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
+};
+
 const _on = function on(name, value, handler, onsRef) {
   const go = this();
   // console.log('go on', go.link.name, { go }, name, value, handler);
@@ -410,7 +429,7 @@ const emit = function emit(name, value, ...args): boolean {
   // const root = go.root();
   // go.root().emit('_emit', go, `${name}.${value}`, value, ...args);
   for (let p in ps) {
-    console.log('go emit', ps[p]?.link?.name, { go: ps[p] }, name, value, args);
+    // console.log('go emit', ps[p]?.link?.name, { go: ps[p] }, name, value, args);
     const result = ps[p].emitter.emit(`${name}.${value}`, go, value, ...args);
     // root.emit('__emit', go, ps[p], `${name}.${value}`, value, ...args);
     if (result) return result;
@@ -454,10 +473,16 @@ function useGo() {
   return useGoCore(this?.context || GoContext);
 }
 
+// <c.Button {...go.activator(state, 'name')}/>
+function activator(state: [any, React.Dispatch<React.SetStateAction<any>>], mustbe, ifthen = 'active', elsethen = undefined, prop = 'variant') {
+  return { [prop]: isEqual(state[0], mustbe) ? ifthen : elsethen, onClick: () => state[1](mustbe), children: mustbe };
+}
+
 function prev(list) {
   const go = this();
+  const v = arguments.length === 2 ? arguments[1] : go.value;
   if (!Array.isArray(list)) return null;
-  const i = list.findIndex(l => l.id === go.value);
+  const i = list.findIndex(l => l.id === v);
   const ni = (!~i || i == 0 ? list[list.length - 1] : list[i - 1])?.id;
   // console.log('go prev', go.link.name, go.value, i, list.map(l => l.id), '-', ni, { go });
   return ni;
@@ -465,8 +490,9 @@ function prev(list) {
 
 function next(list) {
   const go = this();
+  const v = arguments.length === 2 ? arguments[1] : go.value;
   if (!Array.isArray(list)) return null;
-  const i = list.findIndex(l => l.id === go.value);
+  const i = list.findIndex(l => l.id === v);
   const ni = (!~i || i == list.length - 1 ? list[0] : list[i + 1])?.id;
   // console.log('go next', go.link.name, go.value, i, list.map(l => l.id), '-', ni, { go });
   return ni;
@@ -516,7 +542,7 @@ function _go(path?: PathI | GoCallbackI): GoI {
   if (!path) return go;
   const _path = `${path}`;
   const { data, steps } = go.all(_path);
-  console.log(`go(${path})`, data.map(d => `${d.link}`), steps);
+  // console.log(`go(${path})`, data.map(d => `${d.link}`), steps);
   if (steps.length > data.length + 1 || data[data.length - 1].linkId != steps[steps.length - 1]) return null;
   else return data[data.length - 1];
 }
@@ -604,7 +630,7 @@ const Query = memo(function Query({ query, options, onChange }: any) {
   if (result?.error?.message) console.error(result.error.message);
   if (result?.error) console.log(result.error);
   // if (result?.error?.message) throw new Error(result?.error?.message);
-  useEffect(() => {
+  useMemo(() => {
     if (!result.loading && !!result?.data?.length) onChange && onChange(result);
   }, [result]);
   return null;
@@ -630,7 +656,7 @@ const componentTemplate = `({ deep, data, require, Go }) => {
       do={{
       }}
     >
-      <c.Box ref={ref} h='3em'>{go.toString()}</c.Box>
+      <c.Box ref={ref} h='3em'>{\`\$\{go\}\`}</c.Box>
     </go.On>;
   };
 }`;
@@ -661,12 +687,13 @@ const useHook = function useHook({ path, extendInsert = {}, postfix = 'Hook' }) 
 
   useMemo(() => {
     try { localSelectHandlerId(deep, path, handlerId, setHandlerId); }
-    catch(e) { selectHandler(path, go, deep, setLinks, componentTemplate, extendInsert, postfix); }
+    catch(e) { selectHandler(path, go, deep, setLinks, hookTemplate, extendInsert, postfix); }
   }, []);
 
   return _hook;
 }
 
+let _ComponentInserted: any = {};
 const selectHandler = async (path: [Id, ...Id[]], go, deep, setLinks, template, extendInsert, postfix) => {
   const results = await deep.select(go.loader({ id: { _id: [...path] }, return: { code: { relation: 'to' } } }))
   console.log('selectHandler', results);
@@ -679,20 +706,26 @@ const selectHandler = async (path: [Id, ...Id[]], go, deep, setLinks, template, 
 const insertHandler = async (path: [Id, ...Id[]], go, deep, setLinks, template, extendInsert, postfix) => {
   const containerId = await deep.id(...path.slice(0, -1));
   const last = path[path.length - 1];
-  const { data: [{ id }] } = await deep.insert({
-    type_id: deep.idLocal(dc, 'Handler'),
-    from_id: deep.idLocal(dc, 'clientSupportsJs'),
-    containerId: containerId,
-    name: typeof(last) === 'string' ? last as string : undefined,
-    to: {
-      type_id: deep.idLocal(dtsx, 'TSX'),
-      string: template,
+  if (_ComponentInserted[`${path.join(',')}`]) {
+    await go.delay(300);
+    return await selectHandler(path, go, deep, setLinks, template, extendInsert, postfix);
+  } else {
+    _ComponentInserted[`${path.join(',')}`] = true;
+    const { data: [{ id }] } = await deep.insert({
+      type_id: deep.idLocal(dc, 'Handler'),
+      from_id: deep.idLocal(dc, 'clientSupportsJs'),
       containerId: containerId,
-      name: typeof(last) === 'string' ? `${last}${postfix}` : undefined,
-    },
-    ...extendInsert,
-  })
-  return await selectHandler([id], go, deep, setLinks, template, extendInsert, postfix);
+      name: typeof(last) === 'string' ? last as string : undefined,
+      to: {
+        type_id: deep.idLocal(dtsx, 'TSX'),
+        string: template,
+        containerId: containerId,
+        name: typeof(last) === 'string' ? `${last}${postfix}` : undefined,
+      },
+      ...extendInsert,
+    })
+    return await selectHandler([id], go, deep, setLinks, template, extendInsert, postfix);
+  }
 };
 const insertCode = async (path: [Id, ...Id[]], go, deep, setLinks, handlerId, template, extendInsert, postfix) => {
   const { data: [{ id }] } = await deep.insert({
@@ -743,4 +776,4 @@ const Component = memo(function Component({
   }, []);
 
   return !!handlerId ? <go.Handler handlerId={handlerId} linkId={linkId} {...props}/> : null;
-}, isEqual)
+}, isEqual);
