@@ -9,7 +9,7 @@ import { useGoCore } from './go';
 export function Packages() {
   const deep = useDeep();
   // @ts-ignore
-  const { data, refetch, loading } = deep.useQuery({
+  deep.useSubscription({
     type_id: { _nin: [
       deep.idLocal('@deep-foundation/core', 'Promise'),
       deep.idLocal('@deep-foundation/core', 'Then'),
@@ -50,7 +50,7 @@ export function PreloadProviderCore({
   const [handlers, setHandlers] = useState(preloaded?.handlers || []);
   useMemo(() => {
     // @ts-ignore
-    console.log('preloaded useMemo[]', preloaded?.packages);
+    // console.log('preloaded useMemo[]', preloaded?.packages);
     deep.minilinks.add(preloaded?.packages || [], 'preloader-packages');
     // const i = setInterval(() => {
     //   if (!!deep?.minilinks?.links?.length) {

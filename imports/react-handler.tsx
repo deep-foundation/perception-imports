@@ -144,9 +144,9 @@ export function ReactHandlerEditor({
             <AlertTitle>Editor:</AlertTitle>
           </Alert> */}
           <Box>{handlers.map(f => <React.Fragment key={f.handler_id}>
-            <Box display='inline-flex'>{deep.minilinks.byId[f?.handler_id]?.id} {deep.minilinks.byId[f?.handler_id]?.name}</Box>
-            {!!f.src && <Button variant={file === f.src ? 'active' : null} onClick={() => setFile(f.src)}>src</Button>}
-            {!!f.dist && <Button variant={file === f.dist ? 'active' : null} onClick={() => setFile(f.dist)}>dist</Button>}
+            <Box display='inline-flex' p='0.2em' h='3em'>{deep.minilinks.byId[f?.handler_id]?.id} {deep.minilinks.byId[f?.handler_id]?.name}</Box>
+            {!!f.src && <Button h='3em' variant={file === f.src ? 'active' : null} onClick={() => setFile(f.src)}>src</Button>}
+            {!!f.dist && <Button h='3em' variant={file === f.dist ? 'active' : null} onClick={() => setFile(f.dist)}>dist</Button>}
           </React.Fragment>)}</Box>
           <Box flex={1}>
             {!loading && !!file && [<Editor key={file.id}
