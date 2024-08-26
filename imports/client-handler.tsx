@@ -8,7 +8,7 @@ import isEqual from 'lodash/isEqual';
 import React from 'react';
 import { WatchLink } from './react-handler';
 import { GoContextI, GoProvider, useGoCore } from './go';
-import { useHandlersContext } from './hooks';
+import { useHandlersContext, usePreload } from './hooks';
 import classNames from 'classnames';
 
 export class CatchErrors extends React.Component<{
@@ -105,6 +105,8 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
   const go = useGoCore();
   const goHandler = useHandlersGo();
 
+  const [isPreloaded, repreload] = usePreload();
+
   const {
     ErrorComponent,
     UnhandledComponent,
@@ -135,8 +137,9 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
         errorRenderer={(error, reset) => {
           erroredResetRef.current = async () => {
             // console.log('error reset', file.id);
-            const founded = await deep.select(file.id);
+            // const founded = await deep.select(file.id);
             // console.log('error reset apply', founded, deep.minilinks.update(founded?.data));
+            await repreload();
             reset();
           }
           return <div><ErrorComponent
