@@ -15,7 +15,7 @@ import { ReactHandler } from './react-handler';
 import { useCookiesStore } from '@deep-foundation/store/cookies';
 import { useLocalStore } from '@deep-foundation/store/local';
 import { useQueryStore } from '@deep-foundation/store/query';
-import { getChakraVar, loader, useChakraColor, useLoader } from './hooks';
+import { getChakraVar, loader, useChakraColor, useLoader, usePreload } from './hooks';
 
 const dpl = '@deep-foundation/perception-links';
 const dc = '@deep-foundation/core';
@@ -95,6 +95,9 @@ export interface GoI {
   hgo?: GoI;
 
   data?: { [key:string]: any };
+
+  componentTemplate: typeof componentTemplate;
+  hookTemplate: typeof hookTemplate;
 
   [key:string]: any;
 }
@@ -285,6 +288,9 @@ export const GoProvider = memo(function GoProvider({
     for (let c in custom) {
       go[c] = custom[c];
     }
+
+    go.componentTemplate = componentTemplate;
+    go.hookTemplate = hookTemplate;
 
     // console.log('go fields', 'provider', __p, deep.nameLocal(linkId), go === parentGo ? `parent ${parentGo.__p}` : 'new', go._i, deep.nameLocal(go.linkId), deep.nameLocal(go.value));
   }, [go, value]);
@@ -643,26 +649,40 @@ const noScrollBar = ((s) => ({
   'scrollbar-width': 'none !important',
 }))({ display: 'none' });
 
-const componentTemplate = `({ deep, data, require, Go }) => {
+const componentTemplate = ({ children } = { children: null }) => `({ deep, data, require, Go }) => {
   const React = require('react');
   
+  const dc = '@deep-foundation/core';
+  const dpl = '@deep-foundation/perception-links';
   const c = require('@chakra-ui/react');
 
   return ({
     go,
+    goHandler,
+
+    handlerId,
+    Component,
+
+    linkId,
+    link,
 
     children,
+
+    isActive,
+
+    ...props
   }, ref) => {
     return <go.On
       do={{
       }}
     >
-      <c.Box ref={ref} h='3em'>{\`\$\{go\}\`}</c.Box>
+      ${!!children ? children : `<c.Box ref={ref} h='3em'>{\`\$\{go\}\`}</c.Box>`}
     </go.On>;
   };
 }`;
+componentTemplate.toString = () => componentTemplate();
 
-const hookTemplate = `({ deep, data, require, Go }) => {
+const hookTemplate = () => `({ deep, data, require, Go }) => {
   const React = require('react');
 
   return function() {
@@ -671,9 +691,11 @@ const hookTemplate = `({ deep, data, require, Go }) => {
     return React.useMemo(() => ++rerendersRef.current);
   };
 }`;
+hookTemplate.toString = () => hookTemplate();
 
 const useHook = function useHook({ path, extendInsert = {}, postfix = 'Hook' }) {
   const go = useGoCore();
+  const [isPreloaded, repreload] = usePreload();
   const deep = useDeep();
   const [name] = useState(random());
   const [handlerId, setHandlerId] = useState<Id>();
@@ -688,7 +710,7 @@ const useHook = function useHook({ path, extendInsert = {}, postfix = 'Hook' }) 
 
   useMemo(() => {
     try { localSelectHandlerId(deep, path, handlerId, setHandlerId); }
-    catch(e) { selectHandler(path, go, deep, setLinks, hookTemplate, extendInsert, postfix); }
+    catch(e) { selectHandler(path, go, deep, setLinks, hookTemplate(), extendInsert, postfix).then(() => repreload()); }
   }, []);
 
   return _hook;
@@ -761,6 +783,7 @@ const Component = memo(function Component({
   [key:string]: any;
 }) {
   const go = useGoCore();
+  const [isPreloaded, repreload] = usePreload();
   const deep = useDeep();
   const [name] = useState(random());
   const [handlerId, setHandlerId] = useState<Id>();
@@ -773,7 +796,7 @@ const Component = memo(function Component({
 
   useMemo(() => {
     try { localSelectHandlerId(deep, path, handlerId, setHandlerId); }
-    catch(e) { selectHandler(path, go, deep, setLinks, componentTemplate, extendInsert, postfix); }
+    catch(e) { selectHandler(path, go, deep, setLinks, componentTemplate(), extendInsert, postfix).then(() => repreload()); }
   }, []);
 
   return !!handlerId ? <go.Handler handlerId={handlerId} linkId={linkId} {...props}/> : null;

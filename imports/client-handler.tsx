@@ -112,7 +112,6 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
   const {
     data: Component,
     file, sync,
-    link,
     linkId,
     handlerId,
     context = [],
@@ -125,6 +124,8 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
     setErrorRef,
     ...props
   } = useClientHandler(_props);
+
+  const [link] = deep.useLinks(linkId);
 
   return (<>
     <GoProvider context={HandlersGoContext} linkId={handlerId}>
@@ -142,7 +143,7 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
             UnhandledComponent={UnhandledComponent}
             ErrorComponent={ErrorComponent}
             Component={Component}
-            link={ml?.byId?.[linkId]}
+            link={link}
             file={file}
             {...props}
             handlerId={handlerId}
@@ -158,7 +159,7 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
         {Component ? <>
           {[<ClientHandlerRenderer key={file?.value?.value}
             Component={Component}
-            link={ml?.byId?.[linkId]}
+            link={link}
             {...props}
             linkId={linkId}
             handlerId={handlerId}
@@ -170,7 +171,7 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
           ErrorComponent={ErrorComponent}
           Component={Component}
           file={file}
-          link={ml?.byId?.[linkId]}
+          link={link}
           {...props}
           linkId={linkId}
           handlerId={handlerId}
