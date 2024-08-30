@@ -191,6 +191,8 @@ export const HandlerConfigContext = createContext<{
   setSync: React.Dispatch<React.SetStateAction<boolean>>;
 }>({ sync: false, setSync: (value) => {} });
 
+const _client_handlers_memory = {};
+
 export function useClientHandler(_props: UseClientHandlerProps) {
   const { sync: __sync = false } = useContext(HandlerConfigContext);
   const {
@@ -226,33 +228,51 @@ export function useClientHandler(_props: UseClientHandlerProps) {
   // console.log('ClientHandler root', { linkId, handlerId, context, file, hid, files, Component });
   const lastEvalRef = useRef(0);
   useEffect(() => {
-    if (!hid) return;
-    const value = deep.minilinks.byId[file?.id]?.value?.value;
-    if (!value) {
-      return;
+    if (typeof(window) === 'object') {
+      // @ts-ignore
+      window._deep_perception_client_handlers_memory = _client_handlers_memory;
     }
-    const evalId = ++lastEvalRef.current;
-    evalClientHandler({ value, deep, input: { require, Go: go } }).then(({ data, error }) => {
-      try {
-        if (evalId === lastEvalRef.current) {
-          // console.log('ClientHandler evalClientHandler setState', { file, data, error });
-          if (!error) {
-            setState(() => ({ Component: React.memo(React.forwardRef(data), isEqual) }));
-            erroredResetRef?.current && (erroredResetRef?.current(), erroredResetRef.current = undefined);
+    if (!hid || !file?.id) return;
+    const value = deep.minilinks.byId[file?.id]?.value?.value;
+    if (!value) return;
+    if (!_client_handlers_memory?.[file?.id] || _client_handlers_memory?.[file?.id]?.value != file?.value?.value) {
+      const evalId = ++lastEvalRef.current;
+      evalClientHandler({ value, deep, input: { require, Go: go } }).then(({ data, error }) => {
+        try {
+          if (evalId === lastEvalRef.current) {
+            // console.log('ClientHandler evalClientHandler setState', { file, data, error });
+            if (!error) {
+              _client_handlers_memory[file.id] = {
+                value: file?.value?.value,
+                Component: React.memo(React.forwardRef(data), isEqual),
+              };
+              setState({ Component: _client_handlers_memory[file.id].Component });
+              erroredResetRef?.current && (erroredResetRef?.current(), erroredResetRef.current = undefined);
+            }
+            else {
+              _client_handlers_memory[file.id] = {
+                value: file?.value?.value,
+                error,
+              };
+              setErrorRef.current && setErrorRef.current(error);
+              setState({ Component: undefined, errored: error });
+            }
+          } else {
+            // console.log('ClientHandler evalClientHandler outdated', { file, data, error, evalId, 'lastEvalRef.current': lastEvalRef.current });
           }
-          else {
-            setErrorRef.current && setErrorRef.current(error);
-            setState({ Component: undefined, errored: error });
-          }
-        } else {
-          // console.log('ClientHandler evalClientHandler outdated', { file, data, error, evalId, 'lastEvalRef.current': lastEvalRef.current });
+        } catch(error) {
+          _client_handlers_memory[file.id] = {
+            value: file?.value?.value,
+            error,
+          };
+          setErrorRef.current && setErrorRef.current(error);
+          setState({ Component: undefined, errored: error });
         }
-      } catch(error) {
-        setErrorRef.current && setErrorRef.current(error);
-        setState({ Component: undefined, errored: error });
-      }
-    });
-  }, [files, file?.value?.value, hid]);
+      });
+    } else {
+      setState({ Component: _client_handlers_memory[file.id].Component });
+    }
+  }, [file?.value?.value]);
 
   const erroredResetRef = useRef<any>();
   const setErrorRef = useRef<any>();

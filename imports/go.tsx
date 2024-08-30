@@ -41,6 +41,7 @@ export interface GoI {
   focus?: FocusI;
   set?: FocusI;
   parents: ParentsI;
+  parent: typeof parent;
   focused: typeof focused;
   log: typeof log;
   scroll: typeof scroll;
@@ -266,6 +267,7 @@ export const GoProvider = memo(function GoProvider({
     go.useGo = useGo;
     go.useNav = useNav;
     go.parents = parents;
+    go.parent = parent;
     go.focused = focused;
     go.root = root;
     go.await = _await;
@@ -462,6 +464,14 @@ const parents: ParentsI = function parents(): GoI[] {
   return parents;
 }
 
+const parent = function parent(id): GoI | undefined {
+  const go = this();
+  const parents = go.parents();
+  for (let i = 0; i < parents.length - 1; i++) {
+    if (parents[i].linkId == id) return parents[i];
+  }
+};
+
 const all: AllI = function all(path: string): { steps: Id[]; data: GoI[] } {
   const go = this();
   let pointer: any = go;
@@ -535,7 +545,7 @@ function log(value: string) {
   console.dir(this);
 }
 
-function scroll(options: any = { block: "nearest", inline: "nearest", behavior: 'smooth' }) {
+function scroll(options: any = { block: "center", inline: "center", behavior: 'smooth' }) {
   const go = this();
   // console.log('scroll', go.linkId, go.value);
   (go.ref?.current || go?.hgo()?.ref?.current)?.scrollIntoView(options);
@@ -642,7 +652,7 @@ const Query = memo(function Query({ query, options, onChange }: any) {
   return null;
 }, isEqual);
 
-const noScrollBar = ((s) => ({
+export const noScrollBar = ((s) => ({
   '&::-webkit-scrollbar': s,
   '&::-webkit-scrollbar-track': s,
   '&::-webkit-scrollbar-thumb': s,

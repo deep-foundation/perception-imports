@@ -17,9 +17,12 @@ import globals from "globals";
 import isEqual from 'lodash/isEqual';
 import { MdSaveAlt } from 'react-icons/md';
 import { useResizeDetector } from 'react-resize-detector';
+import { Id } from '@deep-foundation/deeplinks/imports/minilinks';
 
 interface IEditor {
   refEditor?: any;
+  linkId?: Id;
+  subscription?: boolean;
   value?: any;
   onChange?: (value: string) => void;
   onSave?: (value: string) => void;
@@ -56,6 +59,7 @@ function usePsudoResize() {
 export const Editor = React.memo(function Editor({
   refEditor,
   linkId,
+  subscription = false,
   value = '',
   onChange,
   onSave,
@@ -67,7 +71,6 @@ export const Editor = React.memo(function Editor({
   defaultLanguage = "javascript",
   fillSize = false,
   onMount,
-  subscription = false,
   children = null,
   ...props
 }: IEditor) {

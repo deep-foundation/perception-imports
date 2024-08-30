@@ -268,9 +268,9 @@ export const ReactHandler = memo(function ReactHandler({ ...props }: ReactHandle
   const deep = useDeep();
   const go = useGoCore();
 
-  const h = deep.minilinks.byId[props?.handlerId];
+  const [h] = deep.useLinks(props?.handlerId);
 
-  const ch = <ClientHandler key={props.handlerId}
+  const ch = <ClientHandler key={deep.isLink(h) ? `${h}` : props.handlerId}
     ErrorComponent={ClientHandlerErrorComponent}
     UnhandledComponent={ClientHandlerUnhandledComponent}
     {...props}
