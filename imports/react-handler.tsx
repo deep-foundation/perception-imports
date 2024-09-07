@@ -122,7 +122,7 @@ export function ReactHandlerEditor({
   handler,
   disclosure,
 }: {
-  handler: Link<Id>;
+  handler: Id;
   disclosure?: any;
 }) {
   const deep = useDeep();
@@ -130,7 +130,7 @@ export function ReactHandlerEditor({
   const hgo = useHandlersGo();
   const { data: handlers, loading } = deep.useQuery(handler && disclosure.isOpen ? {
     // handler_id: { _in: hgo?.parents()?.map(p => +(`${p.value}`).split('-')[1]) },
-    handler_id: { _eq: handler.id },
+    handler_id: { _eq: handler },
     return: {
       src: { relation: 'src' },
       dist: { relation: 'dist' },
@@ -177,12 +177,12 @@ export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
   const deep = useDeep();
   const hgo = go.hgo;
   const handlerId = hgo?.linkId;
-  const handler = handlerId ? deep.get(handlerId) : undefined;
+  // const handler = handlerId ? deep.get(handlerId) : undefined;
   const [open, setOpen] = useState(false);
 
   const keys = Object.keys(go.children);
 
-  const v = deep.get(go.value);
+  const v = deep.ml.byId[go.value];
 
   return <Box mr='1em' textAlign='right'>
     <Box pointerEvents='all'>
@@ -193,14 +193,14 @@ export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
         setHandler(go.linkId);
       }}>{`${go.link}`}</Button>}
       {!!go && <Button bg='deepBgDark' size='xs' isDisabled>{`(${v || go.value})`}</Button>}
-      {!!handler && <>
+      {/* {!!handler && <>
         <Button size='xs' onClick={() => {
           console.dir(go);
           // @ts-ignore
           window.go = go;
           setHandler(go.linkId);
         }}>{`${handler}`}</Button>
-      </>}
+      </>} */}
       <Button size='xs' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
       {!!open && <Box pointerEvents='none'>
         {keys.map(k => <ReactHandlerTreeItem key={k} go={go.children[k]} setHandler={setHandler}/>)}
@@ -313,7 +313,7 @@ export function ReactHandlersProvider({
       <Box bg='deepBgDark' p='0.3em' pl='0.5em' pr='0.5em'>go:</Box>
       {!!goRoot && renderFocuses([{ handlerId: goRoot?.linkId, go: goRoot }], 0, 'go')} */}
     </VStack>}
-    {!!handler && [<ReactHandlerEditor key={handler?.id} disclosure={disclosure} handler={handler}/>]}
+    {!!handler && [<ReactHandlerEditor key={handler} disclosure={disclosure} handler={handler}/>]}
     </HandlerConfigContext.Provider>
   </ReactHandlersContext.Provider>;
 }
