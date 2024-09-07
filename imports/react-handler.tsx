@@ -13,6 +13,7 @@ import { GoI, useGoCore, GoProvider } from './go';
 import $ from 'jquery';
 import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
+import flatten from 'lodash/flatten';
 
 export const r: any = (path) => {
   if (r.requires[path]) return r.requires[path];
@@ -170,19 +171,26 @@ export function ReactHandlerEditor({
 export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
   go,
   setHandler,
+  goPath = [],
 }: {
   go: any;
   setHandler?: any;
+  goPath?: GoI[];
 }) {
   const deep = useDeep();
   const hgo = go.hgo;
   const handlerId = hgo?.linkId;
-  // const handler = handlerId ? deep.get(handlerId) : undefined;
+  const handler = handlerId ? deep.get(handlerId) : undefined;
   const [open, setOpen] = useState(false);
 
   const keys = Object.keys(go.children);
 
   const v = deep.ml.byId[go.value];
+
+  const isActive = useMemo(() => !!goPath.find(f => f.path === go.path), [goPath]);
+  useEffect(() => {
+    if (isActive) setOpen(true);
+  }, [isActive]);
 
   return <Box mr='1em' textAlign='right'>
     <Box pointerEvents='all'>
@@ -193,17 +201,17 @@ export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
         setHandler(go.linkId);
       }}>{`${go.link}`}</Button>}
       {!!go && <Button bg='deepBgDark' size='xs' isDisabled>{`(${v || go.value})`}</Button>}
-      {/* {!!handler && <>
+      {!!handler && <>
         <Button size='xs' onClick={() => {
-          console.dir(go);
+          console.dir(hgo);
           // @ts-ignore
-          window.go = go;
-          setHandler(go.linkId);
+          window.hgo = hgo;
+          setHandler(handler.id);
         }}>{`${handler}`}</Button>
-      </>} */}
+      </>}
       <Button size='xs' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
       {!!open && <Box pointerEvents='none'>
-        {keys.map(k => <ReactHandlerTreeItem key={k} go={go.children[k]} setHandler={setHandler}/>)}
+        {keys.map(k => <ReactHandlerTreeItem key={k} go={go.children[k]} setHandler={setHandler} goPath={goPath}/>)}
       </Box>}
     </Box>
   </Box>
@@ -243,6 +251,9 @@ export function ReactHandlersProvider({
   useEffect(() => {
     if (handler) disclosure.onOpen();
   }, [handler]);
+  useEffect(() => {
+    if (!disclosure.isOpen) setHandler(undefined);
+  }, [disclosure.isOpen]);
   useEffect(() => {
     $(document).on('click', '.deep-link-id', function(e) {
       const handlerId = $(this).data('deep-link-id');
@@ -294,6 +305,7 @@ export function ReactHandlersProvider({
   // };
   const goRoot = focuses?.[0]?.go?.root();
   const [sync, setSync] = useState(_sync);
+  const goPath = useMemo(() => flatten(focuses.map(f => f.go.parents())), [focuses]);
 
   return <ReactHandlersContext.Provider value={focusedRef}>
     <HandlerConfigContext.Provider value={{ sync, setSync }}>
@@ -308,7 +320,7 @@ export function ReactHandlersProvider({
         setFocuses([]);
       }}>X</Button>
       <Box bg='deepBgDark' p='0.3em' pl='0.5em' pr='0.5em'>handlers:</Box>
-      <ReactHandlerTreeItem go={goRoot} setHandler={setHandler}/>
+      <ReactHandlerTreeItem go={goRoot} setHandler={setHandler} goPath={goPath}/>
       {/* {renderFocuses(focuses)}
       <Box bg='deepBgDark' p='0.3em' pl='0.5em' pr='0.5em'>go:</Box>
       {!!goRoot && renderFocuses([{ handlerId: goRoot?.linkId, go: goRoot }], 0, 'go')} */}
