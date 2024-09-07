@@ -14,7 +14,7 @@ import classNames from 'classnames';
 export class CatchErrors extends React.Component<{
   error?: any;
   onMounted?: (setError: (error?: any) => void) => void;
-  errorRenderer?: (error: Error, reset: () => any) => React.ReactNode;
+  errorRenderer?: (error: Error, reset: () => any, catcher: any) => React.ReactNode;
   reset?: () => any;
   children: any;
 },any> {
@@ -38,18 +38,19 @@ export class CatchErrors extends React.Component<{
     var err = error.constructor('Error in Evaled Script: ' + error.message);
     // +3 because `err` has the line number of the `eval` line plus two.
     err.lineNumber = error.lineNumber - err.lineNumber + 3;
-    console.log('componentDidCatch', err, errorInfo);
+    // console.log('componentDidCatch', err, errorInfo);
+    console.log('componentDidCatch', error, errorInfo);
   }
   componentDidMounted() {
     this?.props?.onMounted && this?.props?.onMounted((error) => this.setState({ error: error }));
   }
 
-  errorRenderer = (error, reset) => <>error native</>;
+  errorRenderer = (error, reset, catcher) => <>error native</>;
 
   render() {
     const error = this.props.error || this.state.error;
     if (error) {
-      return this?.props?.errorRenderer ? this?.props?.errorRenderer(error, this.reset) : this?.errorRenderer(error, this.reset);
+      return this?.props?.errorRenderer ? this?.props?.errorRenderer(error, this.reset, this) : this?.errorRenderer(error, this.reset, this);
     }
 
     return this.props.children; 
@@ -74,10 +75,10 @@ export async function evalClientHandler(options: {
     input = {},
   } = options;
   try {
-    console.log('evalClientHandler', 'value', value);
+    // console.log('evalClientHandler', 'value', value);
     // const evalResult = (new Function(`return ${value}`))();
     const evalResult = eval(value);
-    console.log('evalClientHandler', 'evalResult', evalResult);
+    // console.log('evalClientHandler', 'evalResult', evalResult);
     if (typeof evalResult === 'function') {
       return {
         data: await evalResult({ deep, gql, ...input }),
@@ -336,14 +337,14 @@ export const ClientHandlerRenderer = React.memo(function ClientHandlerRenderer({
 });
 
 export interface ClientHandlerProps extends Partial<ClientHandlerRendererProps> {
-  linkId: Id;
+  linkId?: Id;
   handlerId?: Id;
   handlerQuery?: any;
   context?: Id[];
   error?: any;
   onClose?: () => any;
-  ErrorComponent: (props: ClientHandlerProps) => any;
-  UnhandledComponent: (props: ClientHandlerProps) => any;
+  ErrorComponent?: (props: ClientHandlerProps) => any;
+  UnhandledComponent?: (props: ClientHandlerProps) => any;
   sync?: boolean;
   [key: string]: any;
 }

@@ -110,7 +110,7 @@ const theme = extendTheme({
         _dark: 'deep.800',
       },
       deepLinkNodeBg: {
-        default: 'deep.900',
+        default: 'deep.700',
         _dark: 'white',
       },
       deepLinkNodeColor: {

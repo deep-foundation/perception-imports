@@ -1,21 +1,28 @@
+import _ from 'lodash';
 import {
   Toast,
-  useToast
+  useToast,
+  Button as B,
 } from '@chakra-ui/react';
-import { DeepClient, random, useDeep } from "@deep-foundation/deeplinks/imports/client";
+import * as c from '@chakra-ui/react';
+import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep } from "@deep-foundation/deeplinks/imports/client";
 import { Id, Link } from '@deep-foundation/deeplinks/imports/minilinks';
 import EventEmitter from 'events';
 import isEqual from 'lodash/isEqual';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { HandlerConfigContext, HandlersGoContext, useClientHandler } from './client-handler';
+import { HandlerConfigContext, HandlersGoContext, useClientHandler, useHandlersGo } from './client-handler';
 import { Editor } from './editor';
 import { ReactHandler } from './react-handler';
+import { MdSaveAlt } from 'react-icons/md';
 
 import { useCookiesStore } from '@deep-foundation/store/cookies';
 import { useLocalStore } from '@deep-foundation/store/local';
 import { useQueryStore } from '@deep-foundation/store/query';
 import { getChakraVar, loader, useChakraColor, useLoader, usePreload } from './hooks';
+import { useDebounceCallback } from '@react-hook/debounce';
+import { QueryLink } from '@deep-foundation/deeplinks/imports/client_types';
+import { useAsyncMemo } from "use-async-memo";
 
 const dpl = '@deep-foundation/perception-links';
 const dc = '@deep-foundation/core';
@@ -74,6 +81,7 @@ export interface GoI {
   useChakraColor: typeof useChakraColor;
   HandlerConfigContext: typeof HandlerConfigContext;
   Component: typeof Component;
+  Button: typeof Button;
   useHook: typeof useHook;
   Query: typeof Query;
   useLoader: typeof useLoader;
@@ -255,6 +263,7 @@ export const GoProvider = memo(function GoProvider({
     go.useChakraColor = useChakraColor;
     go.HandlerConfigContext = HandlerConfigContext;
     go.Component = Component;
+    go.Button = Button;
     go.useHook = useHook;
     go.useLoader = useLoader;
     go.loader = _loader;
@@ -366,7 +375,7 @@ function Hotkeys({ context }) {
     const f = fs.pop();
     // console.log('go hotkey keypress', 'fromProvider', f.__p, deep.nameLocal(f.linkId), deep.nameLocal(f.value), ids.join(','));
     if (f) f.do(h.keys[0], { keyboardEvent: e, hotkeyEvent: h });
-  }, { preventDefault: true, enableOnFormTags: true }, [go]);
+  }, { preventDefault: true, enableOnFormTags: false }, [go]);
   return null;
 }
 
@@ -633,8 +642,17 @@ const Subscription = memo(function Subscription({ query, options, interval, onCh
   }, []);
   if (result?.error?.message) console.error(result.error.message);
   if (result?.error) console.log(result.error);
+  // const change = useDebounceCallback((result: any) => {
+  //   onChange && onChange(result)
+  // }, 100);
+  const prevRef = useRef();
   useEffect(() => {
-    if (!result.loading && !!result?.data?.length) onChange && onChange(result)
+    if (!result.loading && !!result?.data?.length) {
+      if (!_.isEqual(result.data, prevRef.current)) {
+        onChange && onChange(result);
+        prevRef.current = result?.data;
+      }
+    }
   }, [result]);
   // if (result?.error?.message) throw new Error(result?.error?.message);
   return null;
@@ -646,8 +664,11 @@ const Query = memo(function Query({ query, options, onChange }: any) {
   if (result?.error?.message) console.error(result.error.message);
   if (result?.error) console.log(result.error);
   // if (result?.error?.message) throw new Error(result?.error?.message);
+  const once = useMemo(() => {
+    return _.once((result) => onChange && onChange(result));
+  }, []);
   useMemo(() => {
-    if (!result.loading && !!result?.data?.length) onChange && onChange(result);
+    if (!result.loading && !!result?.data?.length) once(result);
   }, [result]);
   return null;
 }, isEqual);
@@ -811,3 +832,76 @@ const Component = memo(function Component({
 
   return !!handlerId ? <go.Handler handlerId={handlerId} linkId={linkId} {...props}/> : null;
 }, isEqual);
+
+const Button = memo(function Button(props: any) {
+  const go = useGoCore();
+  const hgo = useHandlersGo();
+  return <B ref={hgo.ref} variant={props?.isActive ? 'active' : undefined} onClick={() => go.do('exec', { id: go.linkId })} {...props}/>;
+}, isEqual);
+
+const Input = React.memo(({
+  path,
+  insert,
+  title,
+  type = 'string',
+
+  ...props
+}: {
+  path: [DeepClientStartItem | QueryLink, ...DeepClientPathItem[]],
+  insert: any;
+  title?: any;
+  type?: 'string' | 'number';
+
+  [key:string]: any;
+}) => {
+  const deep = useDeep();
+  const { name, containerId } = useAsyncMemo<any>(async () => ({
+    name: (path || []).slice(-1)[0],
+    containerId: await deep.id((path || []).slice(0, -1) as any),
+  }), [path], {});
+  const insertedRef = React.useRef(false);
+  const skip = !(path && containerId);
+  const { data: [link], loading } = deep.useSubscription(skip ? {} : {
+    id: { _id: [containerId, name] },
+  }, { skip } as any);
+  const [v, setV] = React.useState('');
+  const [saving, setSaving] = React.useState(false);
+  return <>
+    {!!title && <c.Box color='deepColor'>{title}</c.Box>}
+    <c.InputGroup position='relative'>
+      <c.Input
+        value={v} onChange={(e) => setV(e?.target?.value)}
+        h='3em'
+        {...props}
+      />
+      {!!link && <c.Text
+        position='absolute' left='1.4em' bottom='0.1em'
+        pointerEvents='none' fontSize='xs'
+        noOfLines={1} color='deepColorDisabled'
+      >
+        {`${link?.value?.value || ''}`}
+      </c.Text>}
+      <c.InputRightElement h='3em' w='3em'>
+        <c.Button
+          h='3em' w='3em'
+          isLoading={saving}
+          onClick={async () => {
+            if (loading) return;
+            setSaving(true);
+            if (!link && !insertedRef.current) {
+              insertedRef.current = true;
+              const { data: [inserted] } = await deep.insert({
+                containerId, name,
+                [type]: type === 'number' ? +v : v,
+                ...insert,
+              });
+            } else if(!!link) {
+              await deep.value(link.id, v);
+            }
+            setSaving(false);
+          }}
+        ><MdSaveAlt/></c.Button>
+      </c.InputRightElement>
+    </c.InputGroup>
+  </>;
+}, _.isEqual);

@@ -12,6 +12,7 @@ import { GoI, useGoCore, GoProvider } from './go';
 
 import $ from 'jquery';
 import isEqual from 'lodash/isEqual';
+import isEmpty from 'lodash/isEmpty';
 
 export const r: any = (path) => {
   if (r.requires[path]) return r.requires[path];
@@ -26,7 +27,7 @@ const dc = '@deep-foundation/core';
 if (typeof(window) === 'object') window._require = r;
 
 export interface ReactHandlerProps {
-  linkId: Id;
+  linkId?: Id;
   handlerId?: Id;
   context?: Id[];
   ml?: any;
@@ -65,6 +66,10 @@ export function ClientHandlerErrorComponent({
   const _mode = content[mode] ? mode : 'dist';
   const go = useGoCore();
   const ref = useMemo(() => go?.root().ref, []);
+  const FinderButton = deep.idLocal('@deep-foundation/perception-links', 'FinderButton');
+
+  const [h] = deep.useLinks(handlerId);
+
   return <>
     <Button w='100%' h='100%' variant='danger' onClick={disclosure.onOpen}>error</Button>
     <Modal
@@ -90,7 +95,10 @@ export function ClientHandlerErrorComponent({
             </Box>
             <Alert status={'info'}>
               <AlertIcon />
-              <AlertTitle>Handled by {handlerId} {deep.nameLocal(handlerId)}:</AlertTitle>
+              <go.Provider linkId={FinderButton}>
+                <go.Handler handlerId={FinderButton} isActive={go.value === FinderButton}/>
+              </go.Provider>
+              <AlertTitle>Handled by {`${h}`}:</AlertTitle>
               <Button variant={mode === 'dist' ? 'active' : undefined} onClick={() => setMode('dist')}>dist</Button>
               <Button variant={mode === 'src' ? 'active' : undefined} onClick={() => setMode('src')}>src</Button>
             </Alert>
@@ -159,6 +167,48 @@ export function ReactHandlerEditor({
   </Modal>;
 }
 
+export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
+  go,
+  setHandler,
+}: {
+  go: any;
+  setHandler?: any;
+}) {
+  const deep = useDeep();
+  const hgo = go.hgo;
+  const handlerId = hgo?.linkId;
+  const handler = handlerId ? deep.get(handlerId) : undefined;
+  const [open, setOpen] = useState(false);
+
+  const keys = Object.keys(go.children);
+
+  const v = deep.get(go.value);
+
+  return <Box mr='1em' textAlign='right'>
+    <Box pointerEvents='all'>
+      {!!go && <Button bg='deepBgDark' size='xs' onClick={() => {
+        console.dir(go);
+        // @ts-ignore
+        window.go = go;
+        setHandler(go.linkId);
+      }}>{`${go.link}`}</Button>}
+      {!!go && <Button bg='deepBgDark' size='xs' isDisabled>{`(${v || go.value})`}</Button>}
+      {!!handler && <>
+        <Button size='xs' onClick={() => {
+          console.dir(go);
+          // @ts-ignore
+          window.go = go;
+          setHandler(go.linkId);
+        }}>{`${handler}`}</Button>
+      </>}
+      <Button size='xs' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
+      {!!open && <Box pointerEvents='none'>
+        {keys.map(k => <ReactHandlerTreeItem key={k} go={go.children[k]} setHandler={setHandler}/>)}
+      </Box>}
+    </Box>
+  </Box>
+}, isEqual);
+
 export const ReactHandlersContext = createContext<any>(undefined);
 export function ReactHandlersProvider({
   children = null,
@@ -191,6 +241,9 @@ export function ReactHandlersProvider({
   const disclosure = useDisclosure();
   const [handler, setHandler] = useState<any>();
   useEffect(() => {
+    if (handler) disclosure.onOpen();
+  }, [handler]);
+  useEffect(() => {
     $(document).on('click', '.deep-link-id', function(e) {
       const handlerId = $(this).data('deep-link-id');
       const go = $(this).data('deep-link-go');
@@ -207,38 +260,38 @@ export function ReactHandlersProvider({
       }
     });
   }, []);
-  const renderFocuses = (list, level = 0, mode = 'hgo') => {
-    return (uniqBy(list, 'handlerId') as any).map(({ handlerId, go, hgo }) => {
-      return <React.Fragment key={handlerId}>
-        <Box mr={`${level * 1}em`} pointerEvents='all'>
-          {!!go && <Button bg='deepBgDark' size='xs' onClick={() => {
-            console.dir(go);
-            // @ts-ignore
-            window.go = go;
-          }}>go</Button>}
-          {!!hgo && <Button bg='deepBgDark' size='xs' onClick={() => {
-            console.dir(hgo);
-            // @ts-ignore
-            window.hgo = hgo;
-          }}>hgo</Button>}
-          <Button bg='deepBgDark' size='xs' onClick={() => {
-            setHandler(deep.minilinks.byId[handlerId]);
-            disclosure.onOpen();
-          }}>{handlerId} {deep.minilinks.byId[handlerId]?.name}</Button>
-          {!!go?.linkId && <Button size='xs' onClick={() => {
-            setHandler(deep.minilinks.byId[go.linkId]);
-            disclosure.onOpen();
-          }}>{go.linkId} {deep.minilinks.byId[go.linkId]?.name}</Button>}
-          {!!go?.value && <Button size='xs' variant='active' onClick={() => {
-            setHandler(deep.minilinks.byId[go.value]);
-            disclosure.onOpen();
-          }}>{go.value} {deep.minilinks.byId[go.value]?.name}</Button>}
-        </Box>
-        {mode === 'hgo' && renderFocuses(Object.values(hgo.children).map((hgo: GoI) => ({ handlerId: hgo.linkId, hgo })), level + 1, mode)}
-        {mode === 'go' && renderFocuses(Object.values(go.children).map((go: GoI) => ({ handlerId: go.linkId, go })), level + 1, mode)}
-      </React.Fragment>;
-    })
-  };
+  // const renderFocuses = (list, level = 0, mode = 'hgo') => {
+  //   return (uniqBy(list, 'handlerId') as any).map(({ handlerId, go, hgo }) => {
+  //     return <React.Fragment key={handlerId}>
+  //       <Box mr={`${level * 1}em`} pointerEvents='all'>
+  //         {!!go && <Button bg='deepBgDark' size='xs' onClick={() => {
+  //           console.dir(go);
+  //           // @ts-ignore
+  //           window.go = go;
+  //         }}>go</Button>}
+  //         {!!hgo && <Button bg='deepBgDark' size='xs' onClick={() => {
+  //           console.dir(hgo);
+  //           // @ts-ignore
+  //           window.hgo = hgo;
+  //         }}>hgo</Button>}
+  //         <Button bg='deepBgDark' size='xs' onClick={() => {
+  //           setHandler(deep.minilinks.byId[handlerId]);
+  //           disclosure.onOpen();
+  //         }}>{handlerId} {deep.minilinks.byId[handlerId]?.name}</Button>
+  //         {!!go?.linkId && <Button size='xs' onClick={() => {
+  //           setHandler(deep.minilinks.byId[go.linkId]);
+  //           disclosure.onOpen();
+  //         }}>{go.linkId} {deep.minilinks.byId[go.linkId]?.name}</Button>}
+  //         {!!go?.value && <Button size='xs' variant='active' onClick={() => {
+  //           setHandler(deep.minilinks.byId[go.value]);
+  //           disclosure.onOpen();
+  //         }}>{go.value} {deep.minilinks.byId[go.value]?.name}</Button>}
+  //       </Box>
+  //       {mode === 'hgo' && renderFocuses(Object.values(hgo.children).map((hgo: GoI) => ({ handlerId: hgo.linkId, hgo })), level + 1, mode)}
+  //       {mode === 'go' && renderFocuses(Object.values(go.children).map((go: GoI) => ({ handlerId: go.linkId, go })), level + 1, mode)}
+  //     </React.Fragment>;
+  //   })
+  // };
   const goRoot = focuses?.[0]?.go?.root();
   const [sync, setSync] = useState(_sync);
 
@@ -255,9 +308,10 @@ export function ReactHandlersProvider({
         setFocuses([]);
       }}>X</Button>
       <Box bg='deepBgDark' p='0.3em' pl='0.5em' pr='0.5em'>handlers:</Box>
-      {renderFocuses(focuses)}
+      <ReactHandlerTreeItem go={goRoot} setHandler={setHandler}/>
+      {/* {renderFocuses(focuses)}
       <Box bg='deepBgDark' p='0.3em' pl='0.5em' pr='0.5em'>go:</Box>
-      {!!goRoot && renderFocuses([{ handlerId: goRoot?.linkId, go: goRoot }], 0, 'go')}
+      {!!goRoot && renderFocuses([{ handlerId: goRoot?.linkId, go: goRoot }], 0, 'go')} */}
     </VStack>}
     {!!handler && [<ReactHandlerEditor key={handler?.id} disclosure={disclosure} handler={handler}/>]}
     </HandlerConfigContext.Provider>
@@ -282,7 +336,7 @@ export const ReactHandler = memo(function ReactHandler({ ...props }: ReactHandle
       position='absolute' top='0' right='0'
       h='2m'
       onClick={disclosure.onOpen}
-    >🔧 {h?.id} {h?.name}</Box>} */}
+      >🔧 {h?.id} {h?.name}</Box>} */}
       {props?.children || null}
     </GoProvider>
   </ClientHandler>;
