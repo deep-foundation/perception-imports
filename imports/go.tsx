@@ -805,12 +805,16 @@ const Component = memo(function Component({
   path,
   linkId,
   extendInsert = {},
+  provide = false,
+  on,
   postfix = 'Component',
   ...props
 }: {
   path: [Id, ...Id[]];
   linkId?: Id;
   extendInsert?: any;
+  provide?: boolean;
+  on?: any;
   [key:string]: any;
 }) {
   const go = useGoCore();
@@ -830,7 +834,11 @@ const Component = memo(function Component({
     catch(e) { selectHandler(path, go, deep, setLinks, componentTemplate(), extendInsert, postfix).then(() => repreload()); }
   }, []);
 
-  return !!handlerId ? <go.Handler handlerId={handlerId} linkId={linkId} {...props}/> : null;
+  return !!handlerId ? (
+    provide ? <go.Provider linkId={handlerId} on={on}>
+      <go.Handler handlerId={handlerId} linkId={linkId} {...props}/>
+    </go.Provider> : <go.Handler handlerId={handlerId} linkId={linkId} {...props}/>
+   ) : null;
 }, isEqual);
 
 const Button = memo(function Button(props: any) {
