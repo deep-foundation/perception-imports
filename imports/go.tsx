@@ -673,6 +673,7 @@ const Query = memo(function Query({ query, options, onChange }: any) {
   return null;
 }, isEqual);
 
+// css={go.noScrollBar}
 export const noScrollBar = ((s) => ({
   '&::-webkit-scrollbar': s,
   '&::-webkit-scrollbar-track': s,

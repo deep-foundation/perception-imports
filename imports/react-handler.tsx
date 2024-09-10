@@ -193,23 +193,25 @@ export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
   }, [isActive]);
 
   return <Box mr='1em' textAlign='right'>
-    <Box pointerEvents='all'>
-      {!!go && <Button bg='deepBgDark' size='xs' onClick={() => {
-        console.dir(go);
-        // @ts-ignore
-        window.go = go;
-        setHandler(go.linkId);
-      }}>{`${go.link}`}</Button>}
-      {!!go && <Button bg='deepBgDark' size='xs' isDisabled>{`(${v || go.value})`}</Button>}
-      {!!handler && <>
-        <Button size='xs' onClick={() => {
-          console.dir(hgo);
+    <Box>
+      <Box pointerEvents='all'>
+        {!!go && <Button bg='deepBgDark' size='xs' onClick={() => {
+          console.dir(go);
           // @ts-ignore
-          window.hgo = hgo;
-          setHandler(handler.id);
-        }}>{`${handler}`}</Button>
-      </>}
-      <Button size='xs' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
+          window.go = go;
+          setHandler(go.linkId);
+        }}>{`${go.link}`}</Button>}
+        {!!go && <Button bg='deepBgDark' size='xs' isDisabled>{`(${v || go.value})`}</Button>}
+        {!!handler && <>
+          <Button size='xs' onClick={() => {
+            console.dir(hgo);
+            // @ts-ignore
+            window.hgo = hgo;
+            setHandler(handler.id);
+          }}>{`${handler}`}</Button>
+        </>}
+        <Button size='xs' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
+      </Box>
       {!!open && <Box pointerEvents='none'>
         {keys.map(k => <ReactHandlerTreeItem key={k} go={go.children[k]} setHandler={setHandler} goPath={goPath}/>)}
       </Box>}
@@ -311,11 +313,10 @@ export function ReactHandlersProvider({
     <HandlerConfigContext.Provider value={{ sync, setSync }}>
     {children}
     {!!focuses.length && <VStack
-      position='fixed' top='0' right='0' zIndex={9999}
+      position='fixed' top='0' right='0' height='100%' zIndex={9999}
       alignItems={'end'} pointerEvents='none' userSelect={'none'}
       overflowY='scroll' css={goRoot.noScrollBar}
     >
-      <Box h='100%' w='3em' pointerEvents='none'></Box>
       <Button bg='deepBgDark' size='md' pointerEvents='all' onClick={() => {
         setFocuses([]);
       }}>X</Button>
