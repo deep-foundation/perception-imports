@@ -58,7 +58,7 @@ export function ClientHandlerErrorComponent({
 }) {
   const deep = useDeep();
   const [mode, setMode] = useState('src');
-  const handler = useFindClientHandler({ handlerId });
+  const { handler } = useFindClientHandler({ handlerId });
   const { data: [src], loading: _src } = deep.useQuery({ id: handler?.src_id && mode === 'src' ? handler?.src_id : 0 });
   const { data: [dist], loading: _dist } = deep.useQuery({ id: handler?.dist_id && mode === 'dist' ? handler?.dist_id : 0 });
   const loading = !_src && !_dist;

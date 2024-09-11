@@ -125,6 +125,7 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
     errored,
     erroredResetRef,
     setErrorRef,
+    reloadHandler,
     ...props
   } = useClientHandler(_props);
 
@@ -140,7 +141,7 @@ export const ClientHandler = memo(function ClientHandler(_props: ClientHandlerPr
             // console.log('error reset', file.id);
             // const founded = await deep.select(file.id);
             // console.log('error reset apply', founded, deep.minilinks.update(founded?.data));
-            await repreload();
+            reloadHandler();
             reset();
           }
           return <div><ErrorComponent
@@ -211,7 +212,7 @@ export function useClientHandler(_props: UseClientHandlerProps) {
   const go = useGoCore();
   const goHandler = useHandlersGo();
   const ml = deep?.minilinks;
-  const hid = useFindClientHandler(_props);
+  const { handler: hid, reloadHandler } = useFindClientHandler(_props);
 
   const [{ Component, errored } = {} as any, setState] = useState<any>({ Component: undefined, errored: undefined });
   const [sync, setSync] = useState<boolean>(_sync);
@@ -282,7 +283,21 @@ export function useClientHandler(_props: UseClientHandlerProps) {
     if (!!errored && !sync) setSync(true);
   }, [errored, sync]);
 
-  return { ..._props, ...props, data: Component, handlerId, file, sync, errored, outerError, erroredResetRef, setErrorRef, link, linkId, require };
+  return {
+    ..._props, ...props,
+    data: Component,
+    handlerId,
+    file,
+    sync,
+    errored,
+    outerError,
+    erroredResetRef,
+    setErrorRef,
+    link,
+    linkId,
+    require,
+    reloadHandler,
+  };
 }
 
 export interface ClientHandlerRendererProps {
@@ -377,9 +392,13 @@ export function useFindClientHandler({
     // console.log(handlers, handlerId);
     return handlerId ? handlers.current.find(h => h.handler_id === handlerId) : undefined;
   }, [handlerId]);
+  const [counter, setCounter] = useState(0);
+  const reloadHandler = useCallback(() => {
+    setCounter(c => c + 1);
+  }, []);
   useEffect(() => {
     // if (memoHandler) console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} founded sync`);
-    if (!memoHandler) (async () => {
+    if (!memoHandler || !!counter) (async () => {
       if (asyncHandler) return;
       const handlerIds = handlerQuery ? (await deep.select({
         type_id: deep.idLocal('@deep-foundation/core', 'Handler'),
@@ -395,6 +414,6 @@ export function useFindClientHandler({
       }
       // console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} not founded async`);
     })();
-  }, [context, handlerId, handlerQuery, asyncHandler]);
-  return memoHandler || asyncHandler;
+  }, [context, handlerId, handlerQuery, asyncHandler, counter]);
+  return { handler: asyncHandler || memoHandler, reloadHandler };
 }
