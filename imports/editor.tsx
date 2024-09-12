@@ -90,8 +90,8 @@ export const Editor = React.memo(function Editor({
 
   const { data: [link] } = useLoad({ id: linkId });
 
-  const update = useCallback(() => {
-    if (linkId && v?.length > 0) deep.value(linkId, v);
+  const update = useCallback(async () => {
+    if (linkId && v?.length > 0) await deep.value(linkId, v);
     onSave && onSave(v)
   }, [link, v]);
 

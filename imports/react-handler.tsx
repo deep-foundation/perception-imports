@@ -142,6 +142,7 @@ export function ReactHandlerEditor({
   useEffect(() => {
     if (!loading && !file && handlers?.[0]?.src) setFile(handlers?.[0]?.src);
   }, [loading, handlers]);
+  const { reloadHandler } = useFindClientHandler({ handlerId: handler });
 
   return <Modal blockScrollOnMount={false} isOpen={disclosure.isOpen} onClose={disclosure.onClose}>
     <ModalOverlay />
@@ -160,6 +161,9 @@ export function ReactHandlerEditor({
           <Box flex={1}>
             {!loading && !!file && [<Editor key={file.id}
               linkId={file.id} fillSize
+              onSave={() => {
+                reloadHandler();
+              }}
             />]}
           </Box>
         </Flex>
