@@ -415,5 +415,5 @@ export function useFindClientHandler({
       // console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} not founded async`);
     })();
   }, [context, handlerId, handlerQuery, asyncHandler, counter]);
-  return { handler: asyncHandler || memoHandler, reloadHandler };
+  return { handler: memoHandler || asyncHandler, reloadHandler };
 }
