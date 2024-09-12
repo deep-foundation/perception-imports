@@ -212,7 +212,7 @@ export function useClientHandler(_props: UseClientHandlerProps) {
   const go = useGoCore();
   const goHandler = useHandlersGo();
   const ml = deep?.minilinks;
-  const { handler: hid, reloadHandler } = useFindClientHandler(_props);
+  const { handler: hid, reloadHandler, counter } = useFindClientHandler(_props);
 
   const [{ Component, errored } = {} as any, setState] = useState<any>({ Component: undefined, errored: undefined });
   const [sync, setSync] = useState<boolean>(_sync);
@@ -274,7 +274,7 @@ export function useClientHandler(_props: UseClientHandlerProps) {
     } else {
       setState({ Component: _client_handlers_memory[file.id].Component });
     }
-  }, [file?.value?.value]);
+  }, [file?.value?.value, counter]);
 
   const erroredResetRef = useRef<any>();
   const setErrorRef = useRef<any>();
@@ -415,5 +415,5 @@ export function useFindClientHandler({
       // console.log(`find client handlerId ${handlerId} handler ${JSON.stringify(memoHandler)} not founded async`);
     })();
   }, [context, handlerId, handlerQuery, asyncHandler, counter]);
-  return { handler: asyncHandler || memoHandler, reloadHandler };
+  return { handler: counter && asyncHandler ? asyncHandler : memoHandler, reloadHandler, counter };
 }
