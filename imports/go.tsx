@@ -494,7 +494,7 @@ const all: AllI = function all(path: string): { steps: Id[]; data: GoI[] } {
   return { steps, data };
 }
 
-function useGo() {
+export function useGo() {
   return useGoCore(this?.context || GoContext);
 }
 
