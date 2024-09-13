@@ -235,7 +235,7 @@ export const GoProvider = memo(function GoProvider({
     const pgo = pgoRef.current;
 
     go.linkId = linkId || parentGo.linkId;
-    go.link = deep.minilinks.byId[go.linkId]
+    go.link = deep?.minilinks?.byId[go.linkId]
     go.context = context;
     go.path = linkId ? `${parentGo ? parentGo.path+'.' : ''}${linkId}` : parentGo.path;
     go.value = value;
@@ -304,7 +304,7 @@ export const GoProvider = memo(function GoProvider({
     go.hookTemplate = hookTemplate;
 
     // console.log('go fields', 'provider', __p, deep.nameLocal(linkId), go === parentGo ? `parent ${parentGo.__p}` : 'new', go._i, deep.nameLocal(go.linkId), deep.nameLocal(go.value));
-  }, [go, value]);
+  }, [go, value, deep]);
 
   const _set = useCallback((_value, ...args) => {
     go.value = _value;
