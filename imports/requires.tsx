@@ -1,6 +1,6 @@
 import * as icons from '@chakra-ui/icons';
 import * as chakra from '@chakra-ui/react';
-import deeplinks from '@deep-foundation/deeplinks';
+import * as deeplinks from '@deep-foundation/deeplinks';
 import axios from 'axios';
 import * as axiosHooks from 'axios-hooks';
 import * as classnames from 'classnames';
