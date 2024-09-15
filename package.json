@@ -1,8 +1,9 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.70",
+  "version": "0.0.71",
   "license": "Unlicense",
   "type": "module",
+  "main": "import.js",
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "watch": "tsc -w --project tsconfig.json",

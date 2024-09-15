@@ -29,7 +29,7 @@ export const ColorMode = ({
   )
 }
 
-const theme = extendTheme({
+export const theme = extendTheme({
   config: {
     initialColorMode: 'dark',
     useSystemColorMode: true,

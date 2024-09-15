@@ -19,7 +19,7 @@ import { MdSaveAlt } from 'react-icons/md';
 import { useResizeDetector } from 'react-resize-detector';
 import { Id } from '@deep-foundation/deeplinks/imports/minilinks';
 
-interface IEditor {
+export interface IEditor {
   refEditor?: any;
   linkId?: Id;
   subscription?: boolean;
@@ -51,7 +51,7 @@ const eslintConfig = {
   },
 };
 
-function usePsudoResize() {
+export function usePsudoResize() {
   const ref = useRef();
   return useMemo(() => ({ width: 0, height: 0, ref }), [])
 }
