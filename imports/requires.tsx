@@ -52,7 +52,6 @@ import * as i18n from "i18next";
 import * as LanguageDetector from 'i18next-browser-languagedetector';
 import _ from 'lodash';
 import md5 from "md5";
-import WordCloud from 'react-d3-cloud';
 import * as reacti18next from "react-i18next";
 import * as ReactResizeDetector from 'react-resize-detector';
 import * as recharts from 'recharts';
@@ -143,7 +142,6 @@ export const requires: any = {
   'uuid': uuidv4,
   'd3-force-3d': d3d,
   'd3': D3,
-  'react-d3-cloud': WordCloud,
   'react-resize-detector': ReactResizeDetector,
   '@deep-foundation/store/query': queryStore,
   '@deep-foundation/store/local': localStore,
