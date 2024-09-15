@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.77",
+  "version": "0.0.78",
   "license": "Unlicense",
   "type": "module",
   "main": "import.js",
@@ -64,6 +64,7 @@
     "classnames": "^2.5.1",
     "eslint-linter-browserify": "^9.8.0",
     "jquery": "^3.7.1",
+    "json5": "^2.2.3",
     "react-hotkeys-hook": "^4.5.0",
     "react-icons": "^5.2.1",
     "react-resize-detector": "^11.0.1",

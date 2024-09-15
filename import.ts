@@ -14,3 +14,5 @@ export { ColorMode, theme } from './imports/theme.js';
 export { Packages, usePreload, useHandlersContext, PreloadProviderCore, PreloadProvider, useSymbol, symbol, useLoader, useCanByContain, useChakraColor, getChakraColor, getChakraVar, useChakraVar, PreloadContext, HandlersContext, loader } from './imports/hooks.js';
 
 export { AutoGuest } from './imports/auto-guest.js';
+
+export { requires } from './imports/requires.js';
