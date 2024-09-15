@@ -1,7 +1,6 @@
 
 import { useTheme } from '@chakra-ui/react';
-import { useDeep } from "@deep-foundation/deeplinks/imports/client";
-import { Id } from "@deep-foundation/deeplinks/imports/minilinks";
+import { useDeep, Id } from "@deep-foundation/deeplinks";
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useGoCore } from './go';

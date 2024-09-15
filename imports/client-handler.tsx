@@ -1,6 +1,5 @@
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Id, Link } from '@deep-foundation/deeplinks/imports/minilinks';
-import { DeepClient, useDeep } from '@deep-foundation/deeplinks/imports/client';
+import { Id, Link, DeepClient, useDeep } from '@deep-foundation/deeplinks';
 import { gql } from '@apollo/client/index';
 import $ from 'jquery';
 import isEqual from 'lodash/isEqual';

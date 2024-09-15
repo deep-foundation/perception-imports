@@ -1,4 +1,4 @@
-import { useDeep } from "@deep-foundation/deeplinks/imports/client";
+import { useDeep } from "@deep-foundation/deeplinks";
 import { memo } from "react";
 
 export const Loader = memo(function Loader() {

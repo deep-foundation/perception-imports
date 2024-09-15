@@ -1,5 +1,5 @@
 import { Box, Button, useColorMode, VStack } from '@chakra-ui/react';
-import { useDeep } from "@deep-foundation/deeplinks/imports/client";
+import { useDeep, Id } from '@deep-foundation/deeplinks';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import _ from 'lodash';
@@ -17,7 +17,6 @@ import globals from "globals";
 import isEqual from 'lodash/isEqual';
 import { MdSaveAlt } from 'react-icons/md';
 import { useResizeDetector } from 'react-resize-detector';
-import { Id } from '@deep-foundation/deeplinks/imports/minilinks';
 
 export interface IEditor {
   refEditor?: any;

@@ -5,8 +5,7 @@ import {
   Button as B,
 } from '@chakra-ui/react';
 import * as c from '@chakra-ui/react';
-import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep } from "@deep-foundation/deeplinks/imports/client";
-import { Id, Link } from '@deep-foundation/deeplinks/imports/minilinks';
+import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink } from '@deep-foundation/deeplinks';
 import EventEmitter from 'events';
 import isEqual from 'lodash/isEqual';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,7 +20,6 @@ import { useLocalStore } from '@deep-foundation/store/local';
 import { useQueryStore } from '@deep-foundation/store/query';
 import { getChakraVar, loader, useChakraColor, useLoader, usePreload } from './hooks';
 import { useDebounceCallback } from '@react-hook/debounce';
-import { QueryLink } from '@deep-foundation/deeplinks/imports/client_types';
 import { useAsyncMemo } from "use-async-memo";
 
 const dpl = '@deep-foundation/perception-links';
