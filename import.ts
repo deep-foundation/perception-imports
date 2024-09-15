@@ -7,7 +7,7 @@ export type { ClientHandlerRendererProps, ClientHandlerProps, UseClientHandlerPr
 export { CatchErrors, evalClientHandler, useHandlersGo, useClientHandler, useFindClientHandler, HandlersGoContext, ClientHandler, HandlerConfigContext, ClientHandlerRenderer } from './imports/client-handler';
 
 export type { ReactHandlerProps } from './imports/react-handler';
-export { WatchLink, ClientHandlerErrorComponent, ClientHandlerUnhandledComponent, ReactHandlerEditor, ReactHandlersProvider, createComponent } from './imports/react-handler';
+export { WatchLink, ClientHandlerErrorComponent, ClientHandlerUnhandledComponent, ReactHandlerEditor, ReactHandlersProvider, createComponent, ReactHandlerTreeItem, ReactHandlersContext, ReactHandler, } from './imports/react-handler';
 
 export { ColorMode, theme } from './imports/theme';
 
