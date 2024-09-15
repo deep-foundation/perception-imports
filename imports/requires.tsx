@@ -43,7 +43,6 @@ import * as rjsfValidator from '@rjsf/validator-ajv8';
 // @ts-ignore
 // import * as aframeReact from '@belivvr/aframe-react';
 // import { Entity, Scene } from 'aframe-react';
-import { CatchErrors } from './react-errors';
 import _ from 'lodash';
 import md5 from "md5";
 import { v4 as uuidv4 } from 'uuid';
@@ -80,9 +79,6 @@ import * as useAsyncMemo from "use-async-memo";
 import * as planet from "react-planet";
 import * as ni from "next/image";
 import EmojiPicker from 'emoji-picker-react';
-
-// @ts-ignore
-const GraphQL = dynamic(() => import('./graphql').then(m => m.GraphQL), { ssr: false })
 
 export const requires: any = {
   'lodash': _,
@@ -131,17 +127,6 @@ export const requires: any = {
   // },
   '@deep-foundation/deeplinks': deeplinks,
   '@deep-foundation/perception-imports': perception,
-  '@deep-foundation/perception-app': {
-    TypedIcon,
-    DownIcon,
-    UpIcon,
-    TypeIcon,
-    InIcon,
-    OutIcon,
-    FromIcon,
-    ToIcon,
-    GraphQL,
-  },
   'react-icons/pi': pi,
   'react-icons/bs': bs,
   'react-icons/fi': fi,
