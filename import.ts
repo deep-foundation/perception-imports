@@ -16,3 +16,12 @@ export { Packages, usePreload, useHandlersContext, PreloadProviderCore, PreloadP
 export { AutoGuest } from './imports/auto-guest.js';
 
 export { requires } from './imports/requires.js';
+
+export { TypedIcon } from './imports/icons/typed.js';
+export { DownIcon } from './imports/icons/down.js';
+export { UpIcon } from './imports/icons/up.js';
+export { TypeIcon } from './imports/icons/type.js';
+export { InIcon } from './imports/icons/in.js';
+export { OutIcon } from './imports/icons/out.js';
+export { FromIcon } from './imports/icons/from.js';
+export { ToIcon } from './imports/icons/to.js';

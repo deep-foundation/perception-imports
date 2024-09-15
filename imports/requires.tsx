@@ -60,15 +60,6 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import * as reactHookForm from 'react-hook-form';
 
-import { TypedIcon } from './icons/typed.js';
-import { DownIcon } from './icons/down.js';
-import { UpIcon } from './icons/up.js';
-import { TypeIcon } from './icons/type.js';
-import { InIcon } from './icons/in.js';
-import { OutIcon } from './icons/out.js';
-import { FromIcon } from './icons/from.js';
-import { ToIcon } from './icons/to.js';
-
 import * as ApolloSandbox from '@apollo/sandbox/react/index.cjs';
 import EmojiPicker from 'emoji-picker-react';
 import * as matchSorter from 'match-sorter';
@@ -123,17 +114,6 @@ export const requires: any = {
   //   useCytoEditor,
   // },
   '@deep-foundation/deeplinks': deeplinks,
-  '@deep-foundation/perception-imports': {
-    ...perception,
-    TypedIcon,
-    DownIcon,
-    UpIcon,
-    TypeIcon,
-    InIcon,
-    OutIcon,
-    FromIcon,
-    ToIcon,
-  },
   'react-icons/pi': pi,
   'react-icons/bs': bs,
   'react-icons/fi': fi,
