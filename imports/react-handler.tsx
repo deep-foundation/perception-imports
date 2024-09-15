@@ -1,18 +1,16 @@
-import { useDeep, Id, Link } from '@deep-foundation/deeplinks';
+import { Id, Link, useDeep } from '@deep-foundation/deeplinks';
 import { createContext, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ClientHandler, HandlerConfigContext, HandlersGoContext, useFindClientHandler, useHandlersGo } from './client-handler';
+import { ClientHandler, HandlerConfigContext, HandlersGoContext, useFindClientHandler, useHandlersGo } from './client-handler.js';
 
 import { Alert, AlertIcon, AlertTitle, Box, Button, Flex, Modal, ModalBody, ModalContent, ModalOverlay, Skeleton, useDisclosure, VStack } from '@chakra-ui/react';
 import React from 'react';
 
-import uniqBy from 'lodash/uniqBy';
-import { Editor } from './editor';
-import { GoI, useGoCore, GoProvider } from './go';
+import { Editor } from './editor.js';
+import { GoI, GoProvider, useGoCore } from './go.js';
 
 import $ from 'jquery';
-import isEqual from 'lodash/isEqual';
-import isEmpty from 'lodash/isEmpty';
-import flatten from 'lodash/flatten';
+import flatten from 'lodash/flatten.js';
+import isEqual from 'lodash/isEqual.js';
 
 export const r: any = (path) => {
   if (r.requires[path]) return r.requires[path];

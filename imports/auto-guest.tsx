@@ -1,5 +1,5 @@
 import { useDeep, useTokenController } from "@deep-foundation/deeplinks";
-import { useLocalStore } from "@deep-foundation/store/local";
+import { useLocalStore } from "@deep-foundation/store/local.js";
 import Debug from 'debug';
 import React, { useEffect, useState } from "react";
 

@@ -14,7 +14,7 @@ import { linter } from "@codemirror/lint";
 import { esLint } from "@codemirror/lang-javascript";
 import * as eslint from "eslint-linter-browserify";
 import globals from "globals";
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 import { MdSaveAlt } from 'react-icons/md';
 import { useResizeDetector } from 'react-resize-detector';
 

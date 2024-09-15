@@ -1,13 +1,13 @@
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Id, Link, DeepClient, useDeep } from '@deep-foundation/deeplinks';
-import { gql } from '@apollo/client/index';
+import { gql } from '@apollo/client/index.js';
 import $ from 'jquery';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 
 import React from 'react';
-import { WatchLink } from './react-handler';
-import { GoContextI, GoProvider, useGoCore } from './go';
-import { useHandlersContext, usePreload } from './hooks';
+import { WatchLink } from './react-handler.js';
+import { GoContextI, GoProvider, useGoCore } from './go.js';
+import { useHandlersContext, usePreload } from './hooks.js';
 import classNames from 'classnames';
 
 export class CatchErrors extends React.Component<{

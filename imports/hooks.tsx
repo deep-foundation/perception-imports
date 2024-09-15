@@ -3,7 +3,7 @@ import { useTheme } from '@chakra-ui/react';
 import { useDeep, Id } from "@deep-foundation/deeplinks";
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useGoCore } from './go';
+import { useGoCore } from './go.js';
 
 export function Packages() {
   const deep = useDeep();
