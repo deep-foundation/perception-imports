@@ -5,7 +5,8 @@ import {
   Button as B,
 } from '@chakra-ui/react';
 import * as c from '@chakra-ui/react';
-import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink, Subscription, Query } from '@deep-foundation/deeplinks';
+import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink } from '@deep-foundation/deeplinks';
+import { Subscription, Query } from '@deep-foundation/deeplinks/imports/client.js';
 import EventEmitter from 'events';
 import isEqual from 'lodash/isEqual.js';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
