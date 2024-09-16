@@ -195,23 +195,23 @@ export const ReactHandlerTreeItem = memo(function ReactHandlerTreeItem({
 
   return <Box mr='1em' textAlign='right'>
     <Box>
-      <Box pointerEvents='all'>
-        {!!go && <Button bg='deepBgDark' size='xs' onClick={() => {
+      <Box>
+        {!!go && <Button bg='deepBgDark' size='xs' pointerEvents='all' onClick={() => {
           console.dir(go);
           // @ts-ignore
           window.go = go;
           setHandler(go.linkId);
         }}>{`${go.link}`}</Button>}
-        {!!go && <Button bg='deepBgDark' size='xs' isDisabled>{`(${v || go.value})`}</Button>}
+        {!!go && <Button bg='deepBgDark' size='xs' pointerEvents='all' isDisabled>{`(${v || go.value})`}</Button>}
         {!!handler && <>
-          <Button size='xs' onClick={() => {
-            console.dir(hgo);
+          <Button size='xs' pointerEvents='all' onClick={() => {
+            console.dir(hgo); 
             // @ts-ignore
             window.hgo = hgo;
             setHandler(handler.id);
           }}>{`${handler}`}</Button>
         </>}
-        <Button size='xs' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
+        <Button size='xs' pointerEvents='all' variant={open ? 'active' : undefined} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</Button>
       </Box>
       {!!open && <Box pointerEvents='none'>
         {keys.map(k => <ReactHandlerTreeItem key={k} go={go.children[k]} setHandler={setHandler} goPath={goPath}/>)}

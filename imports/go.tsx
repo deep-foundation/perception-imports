@@ -5,7 +5,7 @@ import {
   Button as B,
 } from '@chakra-ui/react';
 import * as c from '@chakra-ui/react';
-import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink } from '@deep-foundation/deeplinks';
+import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink, Subscription, Query } from '@deep-foundation/deeplinks';
 import EventEmitter from 'events';
 import isEqual from 'lodash/isEqual.js';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -629,47 +629,6 @@ async function save(handlerId) {
     return go.deep.value(history?.id || go._inserted, `${go.value}`);
   }
 }
-
-const Subscription = memo(function Subscription({ query, options, interval, onChange }: any) {
-  const deep = useDeep();
-  const result: any = deep[interval ? 'useQuery' : 'useSubscription'](query, options);
-  useEffect(() => {
-    if (!interval) return;
-    const i = setInterval(() => result.refetch(), interval);
-    return () => clearInterval(i);
-  }, []);
-  if (result?.error?.message) console.error(result.error.message);
-  if (result?.error) console.log(result.error);
-  // const change = useDebounceCallback((result: any) => {
-  //   onChange && onChange(result)
-  // }, 100);
-  const prevRef = useRef();
-  useEffect(() => {
-    if (!result.loading && !!result?.data?.length) {
-      if (!_.isEqual(result.data, prevRef.current)) {
-        onChange && onChange(result);
-        prevRef.current = result?.data;
-      }
-    }
-  }, [result]);
-  // if (result?.error?.message) throw new Error(result?.error?.message);
-  return null;
-}, isEqual)
-
-const Query = memo(function Query({ query, options, onChange }: any) {
-  const deep = useDeep();
-  const result: any = deep.useQuery(query, options);
-  if (result?.error?.message) console.error(result.error.message);
-  if (result?.error) console.log(result.error);
-  // if (result?.error?.message) throw new Error(result?.error?.message);
-  const once = useMemo(() => {
-    return _.once((result) => onChange && onChange(result));
-  }, []);
-  useMemo(() => {
-    if (!result.loading && !!result?.data?.length) once(result);
-  }, [result]);
-  return null;
-}, isEqual);
 
 // css={go.noScrollBar}
 export const noScrollBar = ((s) => ({
