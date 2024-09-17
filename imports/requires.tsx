@@ -68,6 +68,8 @@ import * as InfiniteScroll from 'react-infinite-scroller';
 import * as planet from "react-planet";
 import * as useAsyncMemo from "use-async-memo";
 
+import * as semver from 'semver';
+
 export const requires: any = {
   'lodash': _,
   'jquery': $,
@@ -160,5 +162,7 @@ export const requires: any = {
   'react-planet': planet,
   'next/image': ni,
   'emoji-picker-react': EmojiPicker,
+
+  'semver': semver,
 };
 

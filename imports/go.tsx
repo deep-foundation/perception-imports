@@ -71,7 +71,7 @@ export interface GoI {
   useNav: typeof useNav;
   Provider: typeof GoProvider;
   Editor: typeof Editor;
-  Handler: typeof ReactHandler;
+  Handler: typeof Handler;
   Subscription: typeof Subscription;
   useLocalStore: typeof useLocalStore;
   useQueryStore: typeof useQueryStore;
@@ -251,7 +251,7 @@ export const GoProvider = memo(function GoProvider({
     go.Save = Save;
     // @ts-ignore
     go.Provider = GoProvider;
-    go.Handler = ReactHandler;
+    go.Handler = Handler;
     go.Editor = Editor;
     go.Subscription = Subscription;
     go.Query = Query;
@@ -759,6 +759,26 @@ const localSelectHandlerId = (deep, path, handlerId, setHandlerId) => {
   code = handler.to;
   if (handler && code) setHandlerId(id);
 }
+
+const Handler = memo(function Handler({
+  provide = false,
+  handlerId,
+  linkId,
+  on,
+  ...props
+}: {
+  provide?: boolean;
+  handlerId?: Id;
+  linkId?: Id;
+  on?: any;
+  [key: string]: any;
+}) {
+  const go = useGoCore();
+  const handler = <ReactHandler handlerId={handlerId} linkId={linkId} {...props}/>;
+  return provide ? <go.Provider linkId={linkId || handlerId} on={on}>
+    {handler}
+  </go.Provider> : handler;
+});
 
 const Component = memo(function Component({
   path,
