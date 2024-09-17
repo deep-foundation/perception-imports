@@ -1,15 +1,17 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.101",
+  "version": "0.0.102",
   "license": "Unlicense",
   "type": "module",
   "main": "import.js",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "package:build": "tsc --project tsconfig.json",
+    "build": "npm run package:build",
     "watch": "tsc -w --project tsconfig.json",
-    "unbuild": "rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; (cd ./imports; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../); (cd ./imports/gql; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../..); (cd ./benchmarks; rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts; cd ..); (cd ./imports/router; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../..); (cd ./tests; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../)",
-    "publish": "npm run build && npm publish --access public && npm run unbuild",
-    "release": "npm version patch && git push",
+    "package:unbuild": "rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; (cd ./imports; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../); (cd ./imports/gql; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../..); (cd ./benchmarks; rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts; cd ..); (cd ./imports/router; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../..); (cd ./tests; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../)",
+    "unbuild": "npm run package:unbuild",
+    "package:publish": "npm run build && npm publish --access public && npm run unbuild",
+    "package:release": "npm version patch && git push",
     "app:sync": "npm run build; rsync -a ./imports ../node_modules/@deep-foundation/perception-imports/; npm run unbuild",
     "app:dev": "npm run app:sync; (cd ../; rm -rf app; npm run dev)"
   },
