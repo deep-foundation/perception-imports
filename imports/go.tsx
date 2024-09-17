@@ -70,6 +70,7 @@ export interface GoI {
   useGo: typeof useGo;
   useNav: typeof useNav;
   Provider: typeof GoProvider;
+  Input: typeof Input;
   Editor: typeof Editor;
   Handler: typeof Handler;
   Subscription: typeof Subscription;
@@ -252,6 +253,7 @@ export const GoProvider = memo(function GoProvider({
     // @ts-ignore
     go.Provider = GoProvider;
     go.Handler = Handler;
+    go.Input = Input;
     go.Editor = Editor;
     go.Subscription = Subscription;
     go.Query = Query;
