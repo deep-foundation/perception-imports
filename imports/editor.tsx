@@ -13,6 +13,7 @@ import { keymap } from "@codemirror/view";
 import { linter } from "@codemirror/lint";
 import { esLint } from "@codemirror/lang-javascript";
 import * as eslint from "eslint-linter-browserify";
+// @ts-ignore
 import globals from "globals";
 import isEqual from 'lodash/isEqual.js';
 import { MdSaveAlt } from 'react-icons/md';
