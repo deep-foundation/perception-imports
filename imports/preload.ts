@@ -3,9 +3,9 @@ import { generateApolloClient } from '@deep-foundation/hasura/client.js';
 import { DeepClient } from '@deep-foundation/deeplinks';
 import axios from 'axios';
 
-let _path, ssl = true;
+let _path, _ssl = true;
 try { _path = process.env.GQL || process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://deeplinks.deep.foundation/gql' } catch(e) {}
-try { ssl = new URL(_path).protocol === "https:" } catch(e) {}
+try { _ssl = new URL(_path).protocol === "https:" } catch(e) {}
 _path = _path.replace(/(^\w+:|^)\/\//, '');
 
 const _secret = process.env.SECRET || process.env.DEEPLINKS_HASURA_SECRET;
@@ -56,15 +56,20 @@ export function preloadQueries(deep) {
     return { packagesQ, packagesO, handlersQ, handlersO, };
 }
 
-export function preloadApi(path = _path, secret = _secret, token = _token) {
+export function preloadApi(path = _path, secret = _secret, token = _token, ssl = _ssl) {
+    console.log({
+        path: path,
+        ssl: ssl,
+        secret: secret,
+        token: token,
+        ws: true,
+    });
     const deep = new DeepClient({
-        apolloClient: generateApolloClient({
-            path: path,
-            ssl: ssl,
-            secret: secret,
-            token: token,
-            ws: true,
-        }),
+        path: path,
+        ssl: ssl,
+        secret: secret,
+        token: token,
+        ws: true,
     });
 
     const preloaded = {
@@ -89,7 +94,7 @@ export function preloadApi(path = _path, secret = _secret, token = _token) {
         },
     });
 
-    let initial = false;
+    let initial = true;
     return async function handler(
         req: NextApiRequest,
         res: NextApiResponse<Preloaded>
@@ -97,7 +102,9 @@ export function preloadApi(path = _path, secret = _secret, token = _token) {
         if (initial) {
             preloaded.packages = (await deep.select(packagesQ, packagesO))?.plainLinks;
             preloaded.handlers = (await deep.select(handlersQ, handlersO))?.data;
+            initial = false;
         }
+        console.log('preloadApi', { packages: preloaded.packages.length, handlers: preloaded.handlers.length });
         res.status(200).json(preloaded);
     }
 }
@@ -106,5 +113,6 @@ export async function getServerSidePropsPreload(arg, result) {
   const preload = await axios.get(`${process.env.__NEXT_PRIVATE_ORIGIN}/api/preload`);
   result.props = result?.props || {};
   result.props.preloaded = preload.data;
+  console.log('getServerSidePropsPreload', { packages: preload.data.packages.length, handlers: preload.data.handlers.length });
   return result;
 }

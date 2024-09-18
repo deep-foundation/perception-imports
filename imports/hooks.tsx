@@ -104,6 +104,7 @@ export function PreloadProvider({
   preloaded?: { packages?: any[]; handlers?: any[]; };
   children?: any;
  }) {
+  console.log(PreloadProvider, preloaded);
   const deep = useDeep();
   return deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children;
 }
