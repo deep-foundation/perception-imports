@@ -17,6 +17,8 @@ export { AutoGuest } from './imports/auto-guest.js';
 
 export { requires } from './imports/requires.js';
 
+export { preloadQueries, preloadApi, getServerSidePropsPreload } from './imports/preload.js';
+
 export { TypedIcon } from './imports/icons/typed.js';
 export { DownIcon } from './imports/icons/down.js';
 export { UpIcon } from './imports/icons/up.js';

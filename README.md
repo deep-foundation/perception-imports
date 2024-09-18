@@ -75,6 +75,9 @@ import {
     HandlersContext,
     loader,
     AutoGuest,
+    preloadQueries,
+    preloadApi,
+    getServerSidePropsPreload,
 } from '@deep-foundation/perception-imports';
 ```
 
