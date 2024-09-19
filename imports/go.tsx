@@ -874,6 +874,7 @@ const Input = React.memo(({
         <c.Button
           h='3em' w='3em'
           isLoading={saving}
+          isDisabled={props?.isDisabled}
           onClick={async () => {
             if (loading) return;
             setSaving(true);
