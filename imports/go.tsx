@@ -5,7 +5,7 @@ import {
 } from '@chakra-ui/react';
 import * as c from '@chakra-ui/react';
 import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink } from '@deep-foundation/deeplinks';
-import { Subscription, Query } from '@deep-foundation/deeplinks/imports/client';
+import { Subscription, Query } from '@deep-foundation/deeplinks/imports/client.js';
 import EventEmitter from 'events';
 import isEqual from 'lodash/isEqual';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -15,9 +15,9 @@ import { Editor } from './editor';
 import { ReactHandler } from './react-handler';
 import { MdSaveAlt } from 'react-icons/md';
 
-import { useCookiesStore } from '@deep-foundation/store/cookies';
-import { useLocalStore } from '@deep-foundation/store/local';
-import { useQueryStore } from '@deep-foundation/store/query';
+import { useCookiesStore } from '@deep-foundation/store/cookies.js';
+import { useLocalStore } from '@deep-foundation/store/local.js';
+import { useQueryStore } from '@deep-foundation/store/query.js';
 import { getChakraVar, loader, useChakraColor, useLoader, usePreload } from './hooks';
 import { useDebounceCallback } from '@react-hook/debounce';
 import { useAsyncMemo } from "use-async-memo";
