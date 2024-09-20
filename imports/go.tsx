@@ -7,18 +7,18 @@ import * as c from '@chakra-ui/react';
 import { DeepClient, DeepClientPathItem, DeepClientStartItem, random, useDeep, Id, Link, QueryLink } from '@deep-foundation/deeplinks';
 import { Subscription, Query } from '@deep-foundation/deeplinks/imports/client.js';
 import EventEmitter from 'events';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { HandlerConfigContext, HandlersGoContext, useClientHandler, useHandlersGo } from './client-handler';
-import { Editor } from './editor';
-import { ReactHandler } from './react-handler';
+import { HandlerConfigContext, HandlersGoContext, useClientHandler, useHandlersGo } from './client-handler.js';
+import { Editor } from './editor.js';
+import { ReactHandler } from './react-handler.js';
 import { MdSaveAlt } from 'react-icons/md';
 
 import { useCookiesStore } from '@deep-foundation/store/cookies.js';
 import { useLocalStore } from '@deep-foundation/store/local.js';
 import { useQueryStore } from '@deep-foundation/store/query.js';
-import { getChakraVar, loader, useChakraColor, useLoader, usePreload } from './hooks';
+import { getChakraVar, loader, useChakraColor, useHandlersContext, useLoader, usePreload } from './hooks.js';
 import { useDebounceCallback } from '@react-hook/debounce';
 import { useAsyncMemo } from "use-async-memo";
 
@@ -694,13 +694,14 @@ const useHook = function useHook({ path, extendInsert = {}, postfix = 'Hook' }) 
   deep.useMinilinksApply(name, links);
   const { data: _hook } = useClientHandler({ handlerId });
   (typeof (_hook) === 'function' && _hook.name !== deep.nameLocal(handlerId)) && Object.defineProperty(_hook, "name", { value: deep.nameLocal(handlerId) });
+  const handlersRef = useHandlersContext();
 
   useEffect(() => {
-    if (links?.data?.length) try { localSelectHandlerId(deep, path, handlerId, setHandlerId); } catch(e) {}
+    if (links?.data?.length) try { localSelectHandlerId(deep, path, handlerId, setHandlerId, handlersRef.current); } catch(e) {}
   }, [links]);
 
   useMemo(() => {
-    try { localSelectHandlerId(deep, path, handlerId, setHandlerId); }
+    try { localSelectHandlerId(deep, path, handlerId, setHandlerId, handlersRef.current); }
     catch(e) { selectHandler(path, go, deep, setLinks, hookTemplate(), extendInsert, postfix).then(() => repreload()); }
   }, []);
 
@@ -751,14 +752,16 @@ const insertCode = async (path: [Id, ...Id[]], go, deep, setLinks, handlerId, te
   await deep.update({ id: handlerId }, { to_id: id });
   return await selectHandler(path, go, deep, setLinks, template, extendInsert, postfix);
 };
-const localSelectHandlerId = (deep, path, handlerId, setHandlerId) => {
+const localSelectHandlerId = (deep, path, handlerId, setHandlerId, handlers) => {
   let id, handler, code;
       // @ts-ignore
   if (handlerId) return;
   id = deep.idLocal(...path);
   handler = deep.minilinks.byId[id];
-  code = handler.to;
+  const localHandler = (handlers || []).find(h => h.handler_id === id);
+  code = localHandler?.dist;
   if (handler && code) setHandlerId(id);
+  else throw new Error('no local handler');
 }
 
 const Handler = memo(function Handler({
@@ -802,16 +805,24 @@ const Component = memo(function Component({
   const deep = useDeep();
   const [name] = useState(random());
   const [handlerId, setHandlerId] = useState<Id>();
+  const handlersRef = useHandlersContext();
   const [links, setLinks] = useState<any>({ data: [] });
   deep.useMinilinksApply(links, name);
+  console.log('Component', { path, linkId, handlerId, isPreloaded });
 
   useEffect(() => {
-    if (links?.data?.length) try { localSelectHandlerId(deep, path, handlerId, setHandlerId); } catch(e) {}
+    if (links?.data?.length) try { localSelectHandlerId(deep, path, handlerId, setHandlerId, handlersRef.current); } catch(e) {}
   }, [links]);
+  
 
   useMemo(() => {
-    try { localSelectHandlerId(deep, path, handlerId, setHandlerId); }
-    catch(e) { selectHandler(path, go, deep, setLinks, componentTemplate(), extendInsert, postfix).then(() => repreload()); }
+    try { localSelectHandlerId(deep, path, handlerId, setHandlerId, handlersRef.current); }
+    catch(e) {
+      console.log('Component local error', e);
+      selectHandler(path, go, deep, setLinks, componentTemplate(), extendInsert, postfix).then(() => repreload()).catch(e => {
+        console.log('Component remote error', e);
+      });
+    }
   }, []);
 
   return !!handlerId ? (

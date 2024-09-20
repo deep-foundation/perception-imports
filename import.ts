@@ -1,5 +1,6 @@
 export type { onEnterI, onChangeI, PathI, onDoI, GoContextI, GoI, GoCallbackI, FocusI, ParentsI, AllI, DoI, DoHandleI, onDoObjectI } from './imports/go.js';
 export { GoContext, ValueContext, GoProvider, noScrollBar, GoCustomContext, useGoCore, useGo, GoCustomProvider } from './imports/go.js';
+
 export type { IEditor } from './imports/editor.js';
 export { Editor, usePsudoResize } from './imports/editor.js';
 
