@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.109",
+  "version": "0.0.110",
   "license": "Unlicense",
   "type": "module",
   "main": "import.js",
@@ -8,15 +8,15 @@
     "package:build": "tsc --project tsconfig.json",
     "build": "npm run package:build",
     "watch": "tsc -w --project tsconfig.json",
-    "package:unbuild": "rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; (cd ./imports; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../); (cd ./imports/gql; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../..); (cd ./benchmarks; rm -f ./*.js; rm -f ./*.js.map; rm -f ./*.d.ts; cd ..); (cd ./imports/router; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../..); (cd ./tests; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../)",
+    "package:unbuild": "rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; (cd ./imports; rimraf ./*.js; rimraf ./*.js.map; rimraf ./*.d.ts; cd ../);",
     "unbuild": "npm run package:unbuild",
     "package:publish": "npm run build && npm publish --access public && npm run unbuild",
     "package:release": "npm version patch && git push",
-    "app:sync": "npm run build; rsync -a ./imports ../node_modules/@deep-foundation/perception-imports/; npm run unbuild",
+    "app:sync": "npm run build; rsync -a ./imports ../node_modules/@deep-foundation/perception-imports/; cp ./import.js ../node_modules/@deep-foundation/perception-imports/import.js; npm run unbuild",
     "app:dev": "npm run app:sync; (cd ../; rm -rf app; npm run dev)"
   },
   "peerDependencies": {
-    "@deep-foundation/deeplinks": "^0.0.546",
+    "@deep-foundation/deeplinks": "^0.0.550",
     "react": "^18.3.1"
   },
   "engines": {
@@ -55,7 +55,6 @@
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lint": "^6.8.1",
     "@codemirror/view": "^6.30.0",
-    "@deep-foundation/store": "^0.0.31",
     "@monaco-editor/react": "^4.6.0",
     "@pbe/react-yandex-maps": "^1.2.5",
     "@rjsf/chakra-ui": "^5.21.1",

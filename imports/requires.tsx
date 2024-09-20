@@ -18,21 +18,21 @@ import * as json5 from 'json5';
 import * as Resizable from 're-resizable';
 import * as reactHotkeysHook from 'react-hotkeys-hook';
 import { IconContext } from 'react-icons';
-import * as ai from 'react-icons/ai';
-import * as bs from 'react-icons/bs';
-import * as ci from 'react-icons/ci';
-import * as fa from 'react-icons/fa';
-import * as fi from 'react-icons/fi';
-import * as gi from 'react-icons/gi';
-import * as gr from 'react-icons/gr';
-import * as io from 'react-icons/io';
-import * as io5 from 'react-icons/io5';
-import * as lu from 'react-icons/lu';
-import * as md from 'react-icons/md';
-import * as pi from 'react-icons/pi';
-import * as si from 'react-icons/si';
-import * as tb from 'react-icons/tb';
-import * as vsc from 'react-icons/vsc';
+// import * as ai from 'react-icons/ai';
+// import * as bs from 'react-icons/bs';
+// import * as ci from 'react-icons/ci';
+// import * as fa from 'react-icons/fa';
+// import * as fi from 'react-icons/fi';
+// import * as gi from 'react-icons/gi';
+// import * as gr from 'react-icons/gr';
+// import * as io from 'react-icons/io';
+// import * as io5 from 'react-icons/io5';
+// import * as lu from 'react-icons/lu';
+// import * as md from 'react-icons/md';
+// import * as pi from 'react-icons/pi';
+// import * as si from 'react-icons/si';
+// import * as tb from 'react-icons/tb';
+// import * as vsc from 'react-icons/vsc';
 import Linkify from 'react-linkify';
 import * as editor from 'slate';
 import * as slate from 'slate-react';
@@ -45,9 +45,9 @@ import * as themeTools from '@chakra-ui/theme-tools';
 import cookiesStore from '@deep-foundation/store/cookies.js';
 import localStore from '@deep-foundation/store/local.js';
 import queryStore from '@deep-foundation/store/query.js';
-import * as reactYandexMaps from '@pbe/react-yandex-maps';
-import * as D3 from 'd3';
-import * as d3d from 'd3-force-3d';
+// import * as reactYandexMaps from '@pbe/react-yandex-maps';
+// import * as D3 from 'd3';
+// import * as d3d from 'd3-force-3d';
 import * as i18n from "i18next";
 import * as LanguageDetector from 'i18next-browser-languagedetector';
 import _ from 'lodash';
@@ -65,7 +65,7 @@ import EmojiPicker from 'emoji-picker-react';
 import * as matchSorter from 'match-sorter';
 import * as ni from "next/image.js";
 import * as InfiniteScroll from 'react-infinite-scroller';
-import * as planet from "react-planet";
+// import * as planet from "react-planet";
 import * as useAsyncMemo from "use-async-memo";
 
 import * as semver from 'semver';
@@ -116,32 +116,34 @@ export const requires: any = {
   //   useCytoEditor,
   // },
   '@deep-foundation/deeplinks': deeplinks,
-  'react-icons/pi': pi,
-  'react-icons/bs': bs,
-  'react-icons/fi': fi,
-  'react-icons/ci': ci,
-  'react-icons/tb': tb,
-  'react-icons/gr': gr,
-  'react-icons/io': io,
-  'react-icons/md': md,
-  'react-icons/fa': fa,
-  'react-icons/ai': ai,
-  'react-icons/si': si,
-  'react-icons/lu': lu,
-  'react-icons/gi': gi,
-  'react-icons/io5': io5,
-  'react-icons/vsc': vsc,
+  // 'react-icons/pi': pi,
+  // 'react-icons/bs': bs,
+  // 'react-icons/fi': fi,
+  // 'react-icons/ci': ci,
+  // 'react-icons/tb': tb,
+  // 'react-icons/gr': gr,
+  // 'react-icons/io': io,
+  // 'react-icons/md': md,
+  // 'react-icons/fa': fa,
+  // 'react-icons/ai': ai,
+  // 'react-icons/si': si,
+  // 'react-icons/lu': lu,
+  // 'react-icons/gi': gi,
+  // 'react-icons/io5': io5,
+  // 'react-icons/vsc': vsc,
   'react-icons' : IconContext,
   'react-linkify': Linkify,
-  '@rjsf/core': rjsfCore,
-  '@rjsf/chakra-ui': rjsfChakra,
-  '@rjsf/validator-ajv8': rjsfValidator,
+
+  // '@rjsf/core': rjsfCore,
+  // '@rjsf/chakra-ui': rjsfChakra,
+  // '@rjsf/validator-ajv8': rjsfValidator,
+
   // '@belivvr/aframe-react': aframeReact,
   // 'aframe-react': { Entity, Scene },
   'md5': md5,
   'uuid': uuidv4,
-  'd3-force-3d': d3d,
-  'd3': D3,
+  // 'd3-force-3d': d3d,
+  // 'd3': D3,
   'react-resize-detector': ReactResizeDetector,
   '@deep-foundation/store/query': queryStore,
   '@deep-foundation/store/local': localStore,
@@ -151,7 +153,7 @@ export const requires: any = {
   "i18next": i18n,
   'i18next-browser-languagedetector': LanguageDetector,
   "react-i18next": reacti18next,
-  "@pbe/react-yandex-maps": reactYandexMaps,
+  // "@pbe/react-yandex-maps": reactYandexMaps,
   // "react-calendar-timeline": ReactCalendarTimeline,
   "moment": moment,
   "react-hook-form": reactHookForm,
@@ -159,7 +161,7 @@ export const requires: any = {
   'react-infinite-scroller': InfiniteScroll,
   'match-sorter': matchSorter,
   'use-async-memo': useAsyncMemo,
-  'react-planet': planet,
+  // 'react-planet': planet,
   'next/image': ni,
   'emoji-picker-react': EmojiPicker,
 

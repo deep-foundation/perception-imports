@@ -16,7 +16,7 @@ type Preloaded = {
     packages: any[];
 }
 
-export function preloadQueries(deep) {
+export async function preloadQueries(deep) {
     const packagesQ = {
         type_id: {
             _nin: [
@@ -25,6 +25,7 @@ export function preloadQueries(deep) {
                 deep.idLocal('@deep-foundation/core', 'Rejected'),
                 deep.idLocal('@deep-foundation/core', 'Resolved'),
                 deep.idLocal('@deep-foundation/core', 'PromiseResult'),
+                await deep.id('@deep-foundation/tsx', 'TSX'),
             ]
         },
         up: {
@@ -56,7 +57,7 @@ export function preloadQueries(deep) {
     return { packagesQ, packagesO, handlersQ, handlersO, };
 }
 
-export function preloadApi(path = _path, secret = _secret, token = _token, ssl = _ssl) {
+export async function preloadApi(path = _path, secret = _secret, token = _token, ssl = _ssl) {
     console.log({
         path: path,
         ssl: ssl,
@@ -77,7 +78,7 @@ export function preloadApi(path = _path, secret = _secret, token = _token, ssl =
         handlers: [],
     };
 
-    const { packagesQ, packagesO, handlersQ, handlersO } = preloadQueries(deep);
+    const { packagesQ, packagesO, handlersQ, handlersO } = await preloadQueries(deep);
 
     deep.subscribe(packagesQ, packagesO).subscribe({
         // @ts-ignore
