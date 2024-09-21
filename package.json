@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.115",
+  "version": "0.0.116",
   "license": "Unlicense",
   "type": "module",
   "main": "import.js",
@@ -87,6 +87,7 @@
     "react-hotkeys-hook": "^4.5.0",
     "react-i18next": "^15.0.2",
     "react-icons": "^5.2.1",
+    "react-infinite-scroller": "^1.2.6",
     "react-linkify": "^1.0.0-alpha",
     "react-planet": "^1.0.1-ie11",
     "react-resize-detector": "^11.0.1",
