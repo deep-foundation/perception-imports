@@ -642,10 +642,10 @@ export const noScrollBar = ((s) => ({
 
 const componentTemplate = ({ children } = { children: null }) => `({ deep, data, require, Go }) => {
   const React = require('react');
+  const c = require('@chakra-ui/react');
   
   const dc = '@deep-foundation/core';
   const dpl = '@deep-foundation/perception-links';
-  const c = require('@chakra-ui/react');
 
   return ({
     go,
@@ -847,7 +847,7 @@ const Input = React.memo(({
   ...props
 }: {
   path: [DeepClientStartItem | QueryLink, ...DeepClientPathItem[]],
-  insert: any;
+  insert?: any;
   title?: any;
   type?: 'string' | 'number';
 
@@ -890,6 +890,7 @@ const Input = React.memo(({
             setSaving(true);
             if (!link && !insertedRef.current) {
               insertedRef.current = true;
+              if (!insert) return;
               const { data: [inserted] } = await deep.insert({
                 containerId, name,
                 [type]: type === 'number' ? +v : v,

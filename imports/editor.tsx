@@ -80,6 +80,14 @@ export const Editor = React.memo(function Editor({
   const [v, setV] = useState(value);
   const { colorMode } = useColorMode();
   const [lang, setLang] = useState<any>(langs.tsx());
+  const { data: [ObjectedValue] } = deep.useQuery(linkId ? {
+    type_id: deep.idLocal('@deep-foundation/core', 'Value'),
+    to_id: deep.idLocal('@deep-foundation/core', 'Object'),
+    from: {
+      typed: { id: linkId },
+    },
+  } : {}, { skip: !linkId });
+  const isObject = !!ObjectedValue;
 
   const _refEditor = useRef();
   const eref = refEditor || _refEditor
@@ -91,7 +99,17 @@ export const Editor = React.memo(function Editor({
   const { data: [link] } = useLoad({ id: linkId });
 
   const update = useCallback(async () => {
-    if (linkId && v?.length > 0) await deep.value(linkId, v);
+    if (linkId && v?.length > 0) {
+      let _v = v;
+      if (isObject) {
+        try {
+          _v = JSON.parse(v);
+          await deep.value(linkId, _v);
+        } catch(e) {
+          console.log('go.Editor JSON.parse value', e);
+        }
+      } else await deep.value(linkId, _v);
+    }
     onSave && onSave(v)
   }, [link, v]);
 
