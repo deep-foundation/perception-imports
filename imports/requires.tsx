@@ -134,9 +134,9 @@ export const requires: any = {
   'react-icons' : IconContext,
   'react-linkify': Linkify,
 
-  // '@rjsf/core': rjsfCore,
-  // '@rjsf/chakra-ui': rjsfChakra,
-  // '@rjsf/validator-ajv8': rjsfValidator,
+  '@rjsf/core': rjsfCore,
+  '@rjsf/chakra-ui': rjsfChakra,
+  '@rjsf/validator-ajv8': rjsfValidator,
 
   // '@belivvr/aframe-react': aframeReact,
   // 'aframe-react': { Entity, Scene },
