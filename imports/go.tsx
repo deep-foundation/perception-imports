@@ -808,7 +808,6 @@ const Component = memo(function Component({
   const handlersRef = useHandlersContext();
   const [links, setLinks] = useState<any>({ data: [] });
   deep.useMinilinksApply(links, name);
-  console.log('Component', { path, linkId, handlerId, isPreloaded });
 
   useEffect(() => {
     if (links?.data?.length) try { localSelectHandlerId(deep, path, handlerId, setHandlerId, handlersRef.current); } catch(e) {}
