@@ -1,4 +1,4 @@
-import { Box, Button, useColorMode, VStack } from '@chakra-ui/react';
+import { Box, Button, useColorMode, VStack, Progress } from '@chakra-ui/react';
 import { useDeep, Id } from '@deep-foundation/deeplinks';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,12 +12,12 @@ import { history as History } from "@codemirror/commands";
 import { keymap } from "@codemirror/view";
 import { linter } from "@codemirror/lint";
 import { esLint } from "@codemirror/lang-javascript";
-import * as eslint from "eslint-linter-browserify";
 // @ts-ignore
 import globals from "globals";
 import isEqual from 'lodash/isEqual.js';
 import { MdSaveAlt } from 'react-icons/md';
 import { useResizeDetector } from 'react-resize-detector';
+import { useAsyncMemo } from 'use-async-memo';
 
 export interface IEditor {
   refEditor?: any;
@@ -127,13 +127,16 @@ export const Editor = React.memo(function Editor({
   const { width, height, ref } = (fillSize ? useResizeDetector : usePsudoResize)();
   const history = useMemo(() => History(), []);
   // console.log('history', history);
-  const extensions = useMemo(() => [
-    lang,
-    customKeymap,
-    linter(esLint(new eslint.Linter(), eslintConfig)),
-    history,
-    ...(props?.extensions || []),
-  ], [customKeymap]);
+  const extensions = useAsyncMemo(async () => {
+    const eslint = await import('eslint-linter-browserify');
+    return [
+      lang,
+      customKeymap,
+      linter(esLint(new eslint.Linter(), eslintConfig)),
+      history,
+      ...(props?.extensions || []),
+    ];
+  }, [customKeymap]);
   const basicSetup = useMemo(() => ({
     tabSize: 2,
     // @ts-ignore
@@ -149,7 +152,8 @@ export const Editor = React.memo(function Editor({
 
   return <Box {...(fillSize ? { h: '100%', w: '100%' } : {})} position='relative' overflow='hidden' ref={fillSize ? ref : undefined}>
     <Box {...(fillSize ? { position: 'absolute', left: '0', top: '0', right: '0', bottom: '0' } : {})} w='100%'>
-      {(linkId ? !!link : true) && <ReactCodeMirror
+      {!extensions && <Progress isIndeterminate/>}
+      {!!extensions && (linkId ? !!link : true) && <ReactCodeMirror
         ref={eref}
         value={props?.editable !== false && !props?.readOnly ? (linkId ? deep.stringify(link?.value?.value) || startValue : startValue) || '' : value}
         theme={colorMode === 'light' ? githubLight : githubDark}
