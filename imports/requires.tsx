@@ -46,8 +46,8 @@ import cookiesStore from '@deep-foundation/store/cookies.js';
 import localStore from '@deep-foundation/store/local.js';
 import queryStore from '@deep-foundation/store/query.js';
 import * as reactYandexMaps from '@pbe/react-yandex-maps';
-import * as D3 from 'd3';
-import * as d3d from 'd3-force-3d';
+// import * as D3 from 'd3';
+// import * as d3d from 'd3-force-3d';
 import * as i18n from "i18next";
 import * as LanguageDetector from 'i18next-browser-languagedetector';
 import _ from 'lodash';
@@ -142,8 +142,8 @@ export const requires: any = {
   // 'aframe-react': { Entity, Scene },
   'md5': md5,
   'uuid': uuidv4,
-  'd3-force-3d': d3d,
-  'd3': D3,
+  // 'd3-force-3d': d3d,
+  // 'd3': D3,
   'react-resize-detector': ReactResizeDetector,
   '@deep-foundation/store/query': queryStore,
   '@deep-foundation/store/local': localStore,
