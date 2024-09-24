@@ -710,8 +710,7 @@ const useHook = function useHook({ path, extendInsert = {}, postfix = 'Hook' }) 
 
 let _ComponentInserted: any = {};
 const selectHandler = async (path: [Id, ...Id[]], go, deep, setLinks, template, extendInsert, postfix) => {
-  const results = await deep.select(go.loader({ id: { _id: [...path] }, return: { code: { relation: 'to' } } }))
-  console.log('selectHandler', results);
+  const results = await deep.select(go.loader({ id: { _id: [...path] }, return: { code: { relation: 'to' } } }));
   if (!results?.data?.[0]) return await insertHandler(path, go, deep, setLinks, template, extendInsert, postfix)
   else if (results?.data?.[0]?.code) {
     setLinks(results);
