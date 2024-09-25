@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.125",
+  "version": "0.0.126",
   "license": "Unlicense",
   "type": "module",
   "main": "import.js",
@@ -17,6 +17,7 @@
   },
   "peerDependencies": {
     "@deep-foundation/deeplinks": "^0.0.579",
+    "next": "^14.2.13",
     "react": "^18.3.1"
   },
   "engines": {

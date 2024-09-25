@@ -11,7 +11,7 @@ import isEqual from 'lodash/isEqual.js';
 import React, { Context, createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { HandlerConfigContext, HandlersGoContext, useClientHandler, useHandlersGo } from './client-handler.js';
-import { Editor } from './editor.js';
+// import { Editor } from './editor.js';
 import { ReactHandler } from './react-handler.js';
 import { MdSaveAlt } from 'react-icons/md';
 
@@ -21,6 +21,7 @@ import { useQueryStore } from '@deep-foundation/store/query.js';
 import { getChakraVar, loader, useChakraColor, useHandlersContext, useLoader, usePreload } from './hooks.js';
 import { useDebounceCallback } from '@react-hook/debounce';
 import { useAsyncMemo } from "use-async-memo";
+import { Editor } from './editor-async.js';
 
 const dpl = '@deep-foundation/perception-links';
 const dc = '@deep-foundation/core';
