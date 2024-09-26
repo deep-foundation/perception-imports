@@ -21,7 +21,7 @@ import { useQueryStore } from '@deep-foundation/store/query.js';
 import { getChakraVar, loader, useChakraColor, useHandlersContext, useLoader, usePreload } from './hooks.js';
 import { useDebounceCallback } from '@react-hook/debounce';
 import { useAsyncMemo } from "use-async-memo";
-import { Editor } from './editor-async.js';
+// import { Editor } from './editor-async.js';
 
 const dpl = '@deep-foundation/perception-links';
 const dc = '@deep-foundation/core';
@@ -71,7 +71,7 @@ export interface GoI {
   useNav: typeof useNav;
   Provider: typeof GoProvider;
   Input: typeof Input;
-  Editor: typeof Editor;
+  Editor: any;
   Handler: typeof Handler;
   Subscription: typeof Subscription;
   useLocalStore: typeof useLocalStore;
@@ -156,6 +156,11 @@ export const ValueContext = createContext<any>(undefined);
 let _i = 0;
 let _p = 0;
 
+export const GoEditorContext = createContext<any>(undefined);
+export const GoEditorProvider = memo(function GoEditorProvider({ Editor, children }: { Editor: any; children: any }) {
+  return <GoEditorContext.Provider value={Editor}>{children}</GoEditorContext.Provider>
+});
+
 export const GoProvider = memo(function GoProvider({
   linkId,
   value: _value,
@@ -177,6 +182,7 @@ export const GoProvider = memo(function GoProvider({
 
   hotkeys?: boolean;
 }) {
+  const Editor = useContext(GoEditorContext);
   const deep = useDeep();
   const __p = useMemo(() => { return _p++; }, []);
   const _parentGo: GoI = useGoCore(context);

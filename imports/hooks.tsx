@@ -3,7 +3,7 @@ import { useTheme } from '@chakra-ui/react';
 import { useDeep, Id } from "@deep-foundation/deeplinks";
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useGoCore } from './go.js';
+import { GoEditorProvider, useGoCore } from './go.js';
 
 export function Packages() {
   const deep = useDeep();
@@ -99,13 +99,17 @@ export function PreloadProviderCore({
 
 export function PreloadProvider({
   preloaded = {},
+  Editor,
   children = null,
 }: {
   preloaded?: { packages?: any[]; handlers?: any[]; };
+  Editor: any;
   children?: any;
  }) {
   const deep = useDeep();
-  return deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children;
+  return <GoEditorProvider Editor={Editor}>
+    {deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children};
+  </GoEditorProvider>
 }
 
 export function useSymbol() {
@@ -197,6 +201,6 @@ export function useChakraVar(): (color: string) => string {
   const theme = useTheme();
   const go = useGoCore();
   return (color: string) => {
-    return getChakraVar(go().root().ref.current, getChakraColor(theme, color));
+  return getChakraVar(go().root().ref.current, getChakraColor(theme, color));
   };
 }

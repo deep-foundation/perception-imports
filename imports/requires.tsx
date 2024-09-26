@@ -6,7 +6,6 @@ import * as axiosHooks from 'axios-hooks';
 import * as classnames from 'classnames';
 import React from 'react';
 import * as perception from '../import.js';
-// import * as reacticons from 'react-icons';
 import * as debounce from '@react-hook/debounce';
 import * as rjsfChakra from '@rjsf/chakra-ui';
 import * as rjsfCore from '@rjsf/core';
@@ -17,7 +16,6 @@ import $ from 'jquery';
 import * as json5 from 'json5';
 import * as Resizable from 're-resizable';
 import * as reactHotkeysHook from 'react-hotkeys-hook';
-import { IconContext } from 'react-icons';
 import * as ai from 'react-icons/ai';
 import * as bs from 'react-icons/bs';
 import * as ci from 'react-icons/ci';
@@ -131,7 +129,6 @@ export const requires: any = {
   'react-icons/gi': gi,
   'react-icons/io5': io5,
   'react-icons/vsc': vsc,
-  'react-icons' : IconContext,
   'react-linkify': Linkify,
 
   '@rjsf/core': rjsfCore,
