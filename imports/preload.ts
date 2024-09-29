@@ -17,6 +17,7 @@ type Preloaded = {
 }
 
 export async function preloadQueries(deep) {
+    const Preload = await deep.id('@deep-foundation/preload', 'Preload', true);
     const packagesQ = {
         type_id: {
             _nin: [
@@ -32,6 +33,7 @@ export async function preloadQueries(deep) {
             tree_id: { _eq: deep.idLocal('@deep-foundation/core', 'containTree') },
             parent: {
                 type_id: { _eq: deep.idLocal('@deep-foundation/core', 'Package') },
+                ...(Preload ? { in: { type_id: await deep.id('@deep-foundation/preload', 'Preload') } } : {}),
                 string: { value: { _neq: 'deep' } },
             },
         },
