@@ -5,7 +5,6 @@ import { ClientHandler, HandlerConfigContext, HandlersGoContext, useFindClientHa
 import { Alert, AlertIcon, AlertTitle, Box, Button, Flex, Modal, ModalBody, ModalContent, ModalOverlay, Skeleton, useDisclosure, VStack } from '@chakra-ui/react';
 import React from 'react';
 
-import { Editor } from './editor.js';
 import { GoI, GoProvider, useGoCore } from './go.js';
 
 import $ from 'jquery';
@@ -86,7 +85,7 @@ export function ClientHandlerErrorComponent({
               </Button>
             </Alert>
             <Box>
-              <Editor
+              <go.Editor
                 value={JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}
                 editable={false} readOnly
               />
@@ -100,7 +99,7 @@ export function ClientHandlerErrorComponent({
               <Button variant={mode === 'dist' ? 'active' : undefined} onClick={() => setMode('dist')}>dist</Button>
               <Button variant={mode === 'src' ? 'active' : undefined} onClick={() => setMode('src')}>src</Button>
             </Alert>
-            {!!content?.[_mode] && [<Box flex={1} key={_mode}><Editor fillSize
+            {!!content?.[_mode] && [<Box flex={1} key={_mode}><go.Editor fillSize
               linkId={content?.[_mode]?.id}
             /></Box>]}
           </Flex>
@@ -156,7 +155,7 @@ export function ReactHandlerEditor({
             {!!f.dist && <Button h='3em' variant={file === f.dist ? 'active' : null} onClick={() => setFile(f.dist)}>dist</Button>}
           </React.Fragment>)}</Box>
           <Box flex={1}>
-            {!loading && !!file && [<Editor key={file.id}
+            {!loading && !!file && [<go.Editor key={file.id}
               linkId={file.id} fillSize
               onSave={() => {
                 reloadHandler();

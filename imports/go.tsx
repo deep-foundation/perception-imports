@@ -145,10 +145,6 @@ export function GoCustomProvider({ value, children = null }) {
   return <GoCustomContext.Provider value={value}>{children}</GoCustomContext.Provider>;
 }
 
-export type GoContextI = Context<GoI | undefined>;
-
-export const GoContext: GoContextI = createContext<GoI | undefined>(undefined);
-GoContext.displayName = 'GoContext';
 export function useGoCore(context?: GoContextI) { return useContext(context || GoContext); }
 
 export const ValueContext = createContext<any>(undefined);
@@ -160,6 +156,55 @@ export const GoEditorContext = createContext<any>(undefined);
 export const GoEditorProvider = memo(function GoEditorProvider({ Editor, children }: { Editor: any; children: any }) {
   return <GoEditorContext.Provider value={Editor}>{children}</GoEditorContext.Provider>
 });
+
+export function fillGo(go: any = {}) {
+  go.children = go.children || {};
+  // @ts-ignore
+  go.log = log;
+  go.scroll = scroll;
+  go.toString = toString;
+  go.save = save;
+  go.Save = Save;
+  // @ts-ignore
+  go.Provider = GoProvider;
+  go.Handler = Handler;
+  go.Input = Input;
+  go.Subscription = Subscription;
+  go.Query = Query;
+  go.useLocalStore = useLocalStore;
+  go.useQueryStore = useQueryStore;
+  go.useCookiesStore = useCookiesStore;
+  go.getChakraVar = getChakraVar;
+  go.useChakraColor = useChakraColor;
+  go.Component = Component;
+  go.Button = Button;
+  go.useHook = useHook;
+  go.useLoader = useLoader;
+  go.On = On;
+  go.on = _on;
+  go.emit = emit;
+  go.noScrollBar = noScrollBar;
+
+  go.do = _do;
+  go.useGo = useGo;
+  go.useNav = useNav;
+  go.parents = parents;
+  go.parent = parent;
+  go.focused = focused;
+  go.root = root;
+  go.await = _await;
+  go.awaitRef = _awaitRef;
+  go.all = all;
+
+  go.activator = activator;
+  go.next = next;
+  go.prev = prev;
+
+  go.delay = delay;
+  go.useRefValue = useRefValue;
+
+  return go;
+}
 
 export const GoProvider = memo(function GoProvider({
   linkId,
@@ -240,6 +285,7 @@ export const GoProvider = memo(function GoProvider({
   useMemo(() => {
     const pgo = pgoRef.current;
 
+    go.deep = deep;
     go.linkId = linkId || parentGo.linkId;
     go.link = deep?.minilinks?.byId[go.linkId]
     go.context = context;
@@ -249,53 +295,10 @@ export const GoProvider = memo(function GoProvider({
     go._go = _go;
     go.current = go?.children?.[value];
     
-    // @ts-ignore
-    go.deep = deep;
-    go.log = log;
-    go.scroll = scroll;
-    go.toString = toString;
-    go.save = save;
-    go.Save = Save;
-    // @ts-ignore
-    go.Provider = GoProvider;
-    go.Handler = Handler;
-    go.Input = Input;
     go.Editor = Editor;
-    go.Subscription = Subscription;
-    go.Query = Query;
-    go.useLocalStore = useLocalStore;
-    go.useQueryStore = useQueryStore;
-    go.useCookiesStore = useCookiesStore;
-    go.getChakraVar = getChakraVar;
-    go.useChakraColor = useChakraColor;
-    go.HandlerConfigContext = HandlerConfigContext;
-    go.Component = Component;
-    go.Button = Button;
-    go.useHook = useHook;
-    go.useLoader = useLoader;
     go.loader = _loader;
-    go.On = On;
-    go.on = _on;
-    go.emit = emit;
-    go.noScrollBar = noScrollBar;
 
-    go.do = _do;
-    go.useGo = useGo;
-    go.useNav = useNav;
-    go.parents = parents;
-    go.parent = parent;
-    go.focused = focused;
-    go.root = root;
-    go.await = _await;
-    go.awaitRef = _awaitRef;
-    go.all = all;
-
-    go.activator = activator;
-    go.next = next;
-    go.prev = prev;
-
-    go.delay = delay;
-    go.useRefValue = useRefValue;
+    fillGo(go);
 
     go._setValue = setValue;
     go.hgo = hgo;
@@ -911,3 +914,7 @@ const Input = React.memo(({
     </c.InputGroup>
   </>;
 }, isEqual);
+
+export type GoContextI = Context<GoI>;
+export const GoContext: GoContextI = createContext<GoI>(fillGo({}));
+GoContext.displayName = 'GoContext';

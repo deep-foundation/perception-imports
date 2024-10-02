@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { generateApolloClient } from '@deep-foundation/hasura/client.js';
-import { DeepClient } from '@deep-foundation/deeplinks';
+import { DeepClient, toPlain, useDeep } from '@deep-foundation/deeplinks';
 import axios from 'axios';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 let _path, _ssl = true;
 try { _path = process.env.GQL || process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://deeplinks.deep.foundation/gql' } catch(e) {}
@@ -14,6 +15,19 @@ const _token = process.env.TOKEN || process.env.NEXT_PUBLIC_DEEP_TOKEN;
 type Preloaded = {
     handlers: any[];
     packages: any[];
+}
+
+export function toPlainPackages(packages) {
+  const plain = [];
+  for (let l = 0; l < packages.data.length; l++) {
+    const link = packages.data[l];
+    plain.push(toPlain(link));
+    for (let v = 0; v < link._version.length; v++) {
+      const version = link._version[v];
+      plain.push(toPlain(version));
+    }
+  }
+  return plain;
 }
 
 export async function preloadQueries(deep) {
@@ -112,4 +126,85 @@ export async function getServerSidePropsPreload(arg, result) {
   result.props.preloaded = preload.data;
   console.log('getServerSidePropsPreload', { packages: preload.data.packages.length, handlers: preload.data.handlers.length });
   return result;
+}
+
+export const PreloadContext = createContext<[boolean, () => Promise<void>]>(undefined);
+export function usePreload() { return useContext(PreloadContext); }
+export const HandlersContext = createContext<any>([]);
+export function useHandlersContext() { return useContext(HandlersContext); }
+
+export function PreloadProviderCore({
+  preloaded = {},
+  children = null,
+}: {
+  preloaded?: { packages?: any[]; handlers?: any[]; };
+  children?: any;
+}) {
+  const deep = useDeep();
+  const [handlers, setHandlers] = useState(preloaded?.handlers || []);
+  useMemo(() => {
+    // @ts-ignore
+    // console.log('preloaded useMemo[]', preloaded?.packages);
+    deep.minilinks.add(preloaded?.packages || [], 'preloader-packages');
+    // const i = setInterval(() => {
+    //   if (!!deep?.minilinks?.links?.length) {
+    //     setIsPreloaded(true);
+    //     clearInterval(i);
+    //   }
+    // }, 100);
+    // return () => clearInterval(i);
+  }, []);
+  const [isPreloaded, setIsPreloaded] = useState(!!deep?.minilinks?.links?.length);
+  const reload = useCallback(async () => {
+    deep.minilinks.apply(await deep.select({
+      type_id: { _nin: [
+        deep.idLocal('@deep-foundation/core', 'Promise'),
+        deep.idLocal('@deep-foundation/core', 'Then'),
+        deep.idLocal('@deep-foundation/core', 'Rejected'),
+        deep.idLocal('@deep-foundation/core', 'Resolved'),
+        deep.idLocal('@deep-foundation/core', 'PromiseResult'),
+      ] },
+      up: {
+        tree_id: { _eq: deep.idLocal('@deep-foundation/core', 'containTree') },
+        parent: {
+          type_id: { _eq: deep.idLocal('@deep-foundation/core', 'Package') },
+          string: {}
+        },
+      },
+    }), 'preloader');
+  }, []);
+  const _handlers = deep.useSubscription({
+    execution_provider_id: { _eq: deep.idLocal('@deep-foundation/core', 'JSExecutionProvider') },
+    return: {
+      dist: { relation: 'dist' }
+    },
+  }, { table: 'handlers' });
+  useEffect(() => {
+    if (!!_handlers?.data?.length) setHandlers(_handlers?.data);
+  }, [_handlers]);
+  const value: [boolean, () => Promise<void>] = useMemo(() => ([isPreloaded, reload]), [isPreloaded]);
+  const handlersRef = useRef<any>(handlers);
+  handlersRef.current = handlers;
+  return <PreloadContext.Provider value={value}>
+    <HandlersContext.Provider value={handlersRef}>
+      {children}
+    </HandlersContext.Provider>
+  </PreloadContext.Provider>
+}
+
+export function PreloadProvider({
+  preloaded = {},
+  Editor,
+  children = null,
+}: {
+  preloaded?: { packages?: any[]; handlers?: any[]; };
+  Editor: any;
+  children?: any;
+ }) {
+  const deep = useDeep();
+  // return <GoEditorProvider Editor={Editor}>
+  return <>
+    {deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children};
+  </>;
+  {/* </GoEditorProvider> */}
 }
