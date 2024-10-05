@@ -483,7 +483,6 @@ const parents: ParentsI = function parents(): GoI[] {
     if (pointer.go && pointer.go != selfReturnGo) pointer = pointer.go;
     else root = pointer;
   }
-  console.log('parents', parents);
   return parents;
 }
 

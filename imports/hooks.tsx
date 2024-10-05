@@ -108,7 +108,7 @@ export function PreloadProvider({
  }) {
   const deep = useDeep();
   return <GoEditorProvider Editor={Editor}>
-    {deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children};
+    {deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children}
   </GoEditorProvider>
 }
 
