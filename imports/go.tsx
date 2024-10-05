@@ -157,7 +157,9 @@ export const GoEditorProvider = memo(function GoEditorProvider({ Editor, childre
   return <GoEditorContext.Provider value={Editor}>{children}</GoEditorContext.Provider>
 });
 
-export function fillGo(go: any = {}) {
+export const selfReturnGo = () => selfReturnGo;
+
+export function fillGo(go: any = selfReturnGo) {
   go.children = go.children || {};
   // @ts-ignore
   go.log = log;
@@ -230,7 +232,8 @@ export const GoProvider = memo(function GoProvider({
   const Editor = useContext(GoEditorContext);
   const deep = useDeep();
   const __p = useMemo(() => { return _p++; }, []);
-  const _parentGo: GoI = useGoCore(context);
+  const __parentGo: GoI = useGoCore(context);
+  const _parentGo = __parentGo === selfReturnGo ? undefined : __parentGo;
   const hgo: GoI = useGoCore(HandlersGoContext);
   const stateContext = useState(_value);
   const selectedValue = linkId ? stateContext : [_parentGo.value, _parentGo._setValue];
@@ -477,9 +480,10 @@ const parents: ParentsI = function parents(): GoI[] {
   let root, target, pointer: any = go, parents: GoI[] = [];
   while (!root) {
     parents.push(pointer);
-    if (pointer.go) pointer = pointer.go;
+    if (pointer.go && pointer.go != selfReturnGo) pointer = pointer.go;
     else root = pointer;
   }
+  console.log('parents', parents);
   return parents;
 }
 
@@ -572,6 +576,7 @@ function scroll(options: any = { block: "center", inline: "center", behavior: 's
 }
 
 function _go(path?: PathI | GoCallbackI): GoI {
+  // console.log('TEST _go', this);
   if (typeof(path) === 'function') return path(this);
   const go = this.__actualGoRef.current;
   if (!path) return go;
@@ -787,6 +792,7 @@ const Handler = memo(function Handler({
   [key: string]: any;
 }) {
   const go = useGoCore();
+  // console.log('TEST Handler', go, linkId);
   const handler = <ReactHandler handlerId={handlerId} linkId={linkId} {...props}/>;
   return provide ? <go.Provider linkId={linkId || handlerId} on={on}>
     {handler}
@@ -916,5 +922,5 @@ const Input = React.memo(({
 }, isEqual);
 
 export type GoContextI = Context<GoI>;
-export const GoContext: GoContextI = createContext<GoI>(fillGo({}));
+export const GoContext: GoContextI = createContext<GoI>(fillGo(selfReturnGo));
 GoContext.displayName = 'GoContext';

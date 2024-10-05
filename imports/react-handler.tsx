@@ -10,12 +10,26 @@ import { GoI, GoProvider, useGoCore } from './go.js';
 import $ from 'jquery';
 import flatten from 'lodash/flatten.js';
 import isEqual from 'lodash/isEqual.js';
+import { useAsyncMemo } from 'use-async-memo';
 
 export const r: any = (path) => {
   if (r.requires[path]) return r.requires[path];
   throw new Error(`Module not found: Can't resolve ${path}`);
 };
 r.requires = {};
+r._awaited = false;
+r.awaitAll = async (code: string) => {
+  if (r._awaited) return r._awaited;
+  for (let key in r.requires) {
+    console.log('require await', key);
+    r.requires[key] = await r.requires[key];
+    console.log('require resolved', r.requires[key]);
+  }
+  return r._awaited = true;
+};
+r.useAwaitAll = function useAwaitAll() {
+  return useAsyncMemo(async () => await r.awaitAll(), [], false);
+}
 
 const dpl = '@deep-foundation/perception-links';
 const dc = '@deep-foundation/core';
@@ -337,6 +351,8 @@ export const ReactHandler = memo(function ReactHandler({ ...props }: ReactHandle
 
   const [h] = deep.useLinks(props?.handlerId);
 
+  const awaitedAll = r.useAwaitAll();
+
   const ch = <ClientHandler key={deep.isLink(h) ? `${h}` : props.handlerId}
     ErrorComponent={ClientHandlerErrorComponent}
     UnhandledComponent={ClientHandlerUnhandledComponent}
@@ -370,7 +386,7 @@ export const ReactHandler = memo(function ReactHandler({ ...props }: ReactHandle
   }, []);
 
   return <>
-    {[ch]}
+    {awaitedAll && [ch]}
   </>;
 }, isEqual);
 

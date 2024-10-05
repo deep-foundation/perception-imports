@@ -7,30 +7,15 @@ import * as classnames from 'classnames';
 import React from 'react';
 import * as perception from '../import.js';
 import * as debounce from '@react-hook/debounce';
-import * as rjsfChakra from '@rjsf/chakra-ui';
-import * as rjsfCore from '@rjsf/core';
-import * as rjsfValidator from '@rjsf/validator-ajv8';
+// import * as rjsfChakra from '@rjsf/chakra-ui';
+// import * as rjsfCore from '@rjsf/core';
+// import * as rjsfValidator from '@rjsf/validator-ajv8';
 import * as motion from 'framer-motion';
 import isHotkey from 'is-hotkey';
 import $ from 'jquery';
 import * as json5 from 'json5';
 import * as Resizable from 're-resizable';
 import * as reactHotkeysHook from 'react-hotkeys-hook';
-import * as ai from 'react-icons/ai';
-import * as bs from 'react-icons/bs';
-import * as ci from 'react-icons/ci';
-import * as fa from 'react-icons/fa';
-import * as fi from 'react-icons/fi';
-import * as gi from 'react-icons/gi';
-import * as gr from 'react-icons/gr';
-import * as io from 'react-icons/io';
-import * as io5 from 'react-icons/io5';
-import * as lu from 'react-icons/lu';
-import * as md from 'react-icons/md';
-import * as pi from 'react-icons/pi';
-import * as si from 'react-icons/si';
-import * as tb from 'react-icons/tb';
-import * as vsc from 'react-icons/vsc';
 import Linkify from 'react-linkify';
 import * as editor from 'slate';
 import * as slate from 'slate-react';
@@ -114,26 +99,26 @@ export const requires: any = {
   //   useCytoEditor,
   // },
   '@deep-foundation/deeplinks': deeplinks,
-  'react-icons/pi': pi,
-  'react-icons/bs': bs,
-  'react-icons/fi': fi,
-  'react-icons/ci': ci,
-  'react-icons/tb': tb,
-  'react-icons/gr': gr,
-  'react-icons/io': io,
-  'react-icons/md': md,
-  'react-icons/fa': fa,
-  'react-icons/ai': ai,
-  'react-icons/si': si,
-  'react-icons/lu': lu,
-  'react-icons/gi': gi,
-  'react-icons/io5': io5,
-  'react-icons/vsc': vsc,
-  'react-linkify': Linkify,
+  'react-icons/pi': import('react-icons/pi'),
+  'react-icons/bs': import('react-icons/bs'),
+  'react-icons/fi': import('react-icons/fi'),
+  'react-icons/ci': import('react-icons/ci'),
+  'react-icons/tb': import('react-icons/tb'),
+  'react-icons/gr': import('react-icons/gr'),
+  'react-icons/io': import('react-icons/io'),
+  'react-icons/md': import('react-icons/md'),
+  'react-icons/fa': import('react-icons/fa'),
+  'react-icons/ai': import('react-icons/ai'),
+  'react-icons/si': import('react-icons/si'),
+  'react-icons/lu': import('react-icons/lu'),
+  'react-icons/gi': import('react-icons/gi'),
+  'react-icons/io5': import('react-icons/io5'),
+  'react-icons/vsc': import('react-icons/vsc'),
+  'react-linkify': import('react-linkify'),
 
-  '@rjsf/core': rjsfCore,
-  '@rjsf/chakra-ui': rjsfChakra,
-  '@rjsf/validator-ajv8': rjsfValidator,
+  // '@rjsf/core': rjsfCore,
+  // '@rjsf/chakra-ui': rjsfChakra,
+  // '@rjsf/validator-ajv8': rjsfValidator,
 
   // '@belivvr/aframe-react': aframeReact,
   // 'aframe-react': { Entity, Scene },
