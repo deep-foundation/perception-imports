@@ -144,18 +144,26 @@ export const GoCustomContext = createContext<any>({});
 export function GoCustomProvider({ value, children = null }) {
   return <GoCustomContext.Provider value={value}>{children}</GoCustomContext.Provider>;
 }
+export const useGoCustom = function useGoCustom(go) {
+  const custom = useContext(GoCustomContext);
+  if (go && !go._custom) {
+    for (let c in custom) {
+      go[c] = custom[c];
+    }
+    go._custom = true;
+  }
+}
 
-export function useGoCore(context?: GoContextI) { return useContext(context || GoContext); }
+export function useGoCore(context?: GoContextI) {
+  const go = useContext(context || GoContext) || fillGo();
+  useGoCustom(go);
+  return go;
+}
 
 export const ValueContext = createContext<any>(undefined);
 
 let _i = 0;
 let _p = 0;
-
-export const GoEditorContext = createContext<any>(undefined);
-export const GoEditorProvider = memo(function GoEditorProvider({ Editor, children }: { Editor: any; children: any }) {
-  return <GoEditorContext.Provider value={Editor}>{children}</GoEditorContext.Provider>
-});
 
 export const selfReturnGo = () => selfReturnGo;
 
@@ -229,7 +237,6 @@ export const GoProvider = memo(function GoProvider({
 
   hotkeys?: boolean;
 }) {
-  const Editor = useContext(GoEditorContext);
   const deep = useDeep();
   const __p = useMemo(() => { return _p++; }, []);
   const __parentGo: GoI = useGoCore(context);
@@ -248,8 +255,6 @@ export const GoProvider = memo(function GoProvider({
   parentRef.current = _parentGo;
   const pgoRef = useRef<any>();
   const __actualGoRef = useRef<any>(_parentGo);
-
-  const custom = useContext(GoCustomContext) || {};
 
   const { go, parentGo }: { go: GoI, parentGo: GoI } = useMemo(() => {
     const _go = (linkId ? function go(path?: PathI) { return _go._go(path); } : _parentGo) as GoI;
@@ -297,8 +302,7 @@ export const GoProvider = memo(function GoProvider({
     go.go = linkId ? parentGo : parentGo?.go;
     go._go = _go;
     go.current = go?.children?.[value];
-    
-    go.Editor = Editor;
+
     go.loader = _loader;
 
     fillGo(go);
@@ -309,15 +313,13 @@ export const GoProvider = memo(function GoProvider({
     go.__go = parentGo;
     go.__actualGoRef = (linkId ? __actualGoRef : parentGo?.__actualGoRef) || __actualGoRef;
 
-    for (let c in custom) {
-      go[c] = custom[c];
-    }
-
     go.componentTemplate = componentTemplate;
     go.hookTemplate = hookTemplate;
 
     // console.log('go fields', 'provider', __p, deep.nameLocal(linkId), go === parentGo ? `parent ${parentGo.__p}` : 'new', go._i, deep.nameLocal(go.linkId), deep.nameLocal(go.value));
   }, [go, value, deep]);
+
+  useGoCustom(go);
 
   const _set = useCallback((_value, ...args) => {
     go.value = _value;

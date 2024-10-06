@@ -1,9 +1,9 @@
 
 import { useTheme } from '@chakra-ui/react';
-import { useDeep, Id } from "@deep-foundation/deeplinks";
+import { Id, useDeep } from "@deep-foundation/deeplinks";
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { GoEditorProvider, useGoCore } from './go.js';
+import { useGoCore } from './go.js';
 
 export function Packages() {
   const deep = useDeep();
@@ -107,9 +107,9 @@ export function PreloadProvider({
   children?: any;
  }) {
   const deep = useDeep();
-  return <GoEditorProvider Editor={Editor}>
+  return <>
     {deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children}
-  </GoEditorProvider>
+  </>
 }
 
 export function useSymbol() {

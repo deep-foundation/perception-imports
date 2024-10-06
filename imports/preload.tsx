@@ -1,7 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { generateApolloClient } from '@deep-foundation/hasura/client.js';
 import { DeepClient, toPlain, useDeep } from '@deep-foundation/deeplinks';
 import axios from 'axios';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 let _path, _ssl = true;
@@ -194,17 +193,13 @@ export function PreloadProviderCore({
 
 export function PreloadProvider({
   preloaded = {},
-  Editor,
   children = null,
 }: {
   preloaded?: { packages?: any[]; handlers?: any[]; };
-  Editor: any;
   children?: any;
  }) {
   const deep = useDeep();
-  // return <GoEditorProvider Editor={Editor}>
   return <>
     {deep ? [<PreloadProviderCore key={deep.linkId} preloaded={preloaded} children={children}/>] : children};
   </>;
-  {/* </GoEditorProvider> */}
 }

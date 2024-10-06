@@ -1,6 +1,6 @@
 {
   "name": "@deep-foundation/perception-imports",
-  "version": "0.0.135",
+  "version": "0.0.136",
   "license": "Unlicense",
   "type": "module",
   "main": "import.js",

@@ -159,10 +159,10 @@ export function ReactHandlerEditor({
     <ModalContent maxW='90%' maxH='90%' h='100%' opacity={0.9}>
       <ModalBody p='1em'>
         <Flex direction={'column'} h='100%'>
-          {/* <Alert status={'info'}>
+          <Alert status={'info'}>
             <AlertIcon />
             <AlertTitle>Editor:</AlertTitle>
-          </Alert> */}
+          </Alert>
           <Box>{handlers.map(f => <React.Fragment key={f.handler_id}>
             <Box display='inline-flex' p='0.2em' h='3em'>{deep.minilinks.byId[f?.handler_id]?.id} {deep.minilinks.byId[f?.handler_id]?.name}</Box>
             {!!f.src && <Button h='3em' variant={file === f.src ? 'active' : null} onClick={() => setFile(f.src)}>src</Button>}
