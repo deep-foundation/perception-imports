@@ -18,6 +18,7 @@ import isEqual from 'lodash/isEqual.js';
 import { MdSaveAlt } from 'react-icons/md';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAsyncMemo } from 'use-async-memo';
+import JSON5 from 'json5';
 
 export interface IEditor {
   refEditor?: any;
@@ -103,7 +104,7 @@ export const Editor = React.memo(function Editor({
       let _v = v;
       if (isObject) {
         try {
-          _v = JSON.parse(v);
+          _v = JSON5.parse(v);
           await deep.value(linkId, _v);
         } catch(e) {
           console.log('go.Editor JSON.parse value', e);
