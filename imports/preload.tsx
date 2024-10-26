@@ -72,7 +72,7 @@ export async function preloadQueries(deep) {
     return { packagesQ, packagesO, handlersQ, handlersO, };
 }
 
-export async function preloadApi(path = _path, secret = _secret, token = _token, ssl = _ssl) {
+export async function preloadApi(path = _path, secret = _secret, token = _token, ssl = false) {
     const p = path.replace(/(^\w+:|^)\/\//, '');
     const deep = new DeepClient({
         path: p,
